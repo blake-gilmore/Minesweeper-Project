@@ -4,6 +4,6 @@
 int main()
 {
     tagMOUSEINPUT myInput;
-    std::cout << "Hello!";
+    std::cout << "Hello Tiffanie.\n";
     return 0;
 }
