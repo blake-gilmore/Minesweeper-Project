@@ -8,11 +8,12 @@ public:
     minesweeperGame();
     void initializeGame();
     bool MapGame();
+    void printDimensions();
+    HWND initWindow;
 private:
     LPCWSTR windowName = L"Microsoft Minesweeper";
     BYTE bitPointer;
-    HWND initWindow;
-    HDC windowDC;
+        HDC windowDC;
     HDC virtualDC;
     int maxWidth;
     int maxHeight;
@@ -71,38 +72,35 @@ bool minesweeperGame::MapGame()
     bitmap.bmiHeader.biClrUsed = 0;
     bitmap.bmiHeader.biClrImportant = 0;
 
-    bitmapHandle = CreateDIBSection(virtualDC, &bitmap, DIB_RGB_COLORS, (void**)(&bitPointer), NULL, NULL);
+    bitmapHandle = CreateDIBSection(virtualDC, &bitmap, DIB_RGB_COLORS, (void**)(&bitPointer), NULL, 0);
     SelectObject(virtualDC, bitmapHandle);
     BitBlt(virtualDC, 0, 0, maxWidth, maxHeight, windowDC, 0, 0, SRCCOPY);
+    return true;
+}
 
+void minesweeperGame::printDimensions()
+{
+    std::cout << "Width: " << maxWidth;
+    std::cout << "Height: " << maxHeight << std::endl;
+    return;
 }
 
 int main()
 {
+    int width = GetSystemMetrics(SM_CXSCREEN);
+    int height = GetSystemMetrics(SM_CYSCREEN);
+
     minesweeperGame game;
     game.initializeGame();
+    game.MapGame();
     char selection;
-    do
-    {
-        std::cout << "Please press 's' when you have opened the map: ";
-        std::cin >> selection; 
-    }while(selection != 's');
+    Sleep(5000);
+    ShowWindow(game.initWindow, SW_SHOWMAXIMIZED);
 
-
-
-    BYTE* bitPointer;
-    RECT rect;
-    LPCWSTR windowName = L"Microsoft Minesweeper";
-    HWND hWND = FindWindow(NULL, windowName);
-    //Get the window. Got it.
-    HDC windowDC = GetDC(hWND);
-    HDC virtualDC = CreateCompatibleDC(windowDC);
-    int width = GetDeviceCaps(windowDC, HORZRES);
-    int height = GetDeviceCaps(windowDC, VERTRES);
-
-    HBITMAP mainBitmap = CreateCompatibleBitmap(windowDC, width, height);
-    HGDIOBJ newDC = SelectObject(virtualDC, mainBitmap);
-    
-    ReleaseDC()
+    POINT p;
+    p.x = 0; 
+    p.y = 0;
+    ClientToScreen(game.initWindow, &p);
+    std::cout << "X| " << p.x << " Y| " << p.y << std::endl;
     return 0;
 }
