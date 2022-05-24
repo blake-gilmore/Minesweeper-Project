@@ -9,33 +9,55 @@ public:
     void initializeGame();
     bool MapGame();
     void printDimensions();
-    HWND initWindow;
+    void printColor(POINT*);
 private:
-    LPCWSTR windowName = L"Microsoft Minesweeper";
-    BYTE bitPointer;
-        HDC windowDC;
-    HDC virtualDC;
-    int maxWidth;
-    int maxHeight;
-    RECT rect;
+    //LPCWSTR windowName = L"Microsoft Minesweeper";
+    BYTE* bitPointer;
+    int ScreenX;
+    int ScreenY;
     bool gameWin;
-    BITMAPINFO bitmap;
-    HBITMAP bitmapHandle;
-};
+    inline int PosB(int, int);
+    inline int PosG(int, int);
+    inline int PosR(int, int);
+    
 
+};
+inline int minesweeperGame::PosB(int x, int y)
+{
+    return bitPointer[4*((y*ScreenX) + x + 3)];
+}
+inline int minesweeperGame::PosG(int x, int y)
+{
+    return bitPointer[4*((y*ScreenX) + x) + 2];
+}
+inline int minesweeperGame::PosR(int x, int y)
+{
+    return bitPointer[4*((y*ScreenX) + x) + 1];
+}
+void minesweeperGame::printColor(POINT* p)
+{
+    int blue = PosB(p->x, p->y);
+    int green = PosG(p->x, p->y);
+    int red = PosR(p->x, p->y);
+
+    std::cout << "At x: " << p->x << " At y: " << p->y << std::endl;
+
+    std::cout << "Red: " << red << "  Green: " << green << "  Blue: " << blue << std::endl;
+    return;
+}
 
 minesweeperGame::minesweeperGame()
 {
-    windowDC == NULL;
-    maxWidth = 0;
-    maxHeight = 0;
+    ScreenX = 0;
+    ScreenY = 0;
+    bitPointer = 0;
     gameWin = false;
     return;
 }
 
 
 void minesweeperGame::initializeGame()
-{
+{/*
     initWindow = FindWindow(NULL, windowName);
     while (initWindow == NULL)
     {
@@ -43,64 +65,71 @@ void minesweeperGame::initializeGame()
         Sleep(1000);
         initWindow = FindWindow(NULL, windowName);
     }
-    std::cout << "Window Found!\n";
+    std::cout << "Window Found!\n";*/
     return;
 }
 
 
 bool minesweeperGame::MapGame()
 {
-    if (windowDC != NULL)
-    {
-        ReleaseDC(initWindow, windowDC);
-        ReleaseDC(initWindow, virtualDC);
-    }
+    HDC windowDC = GetDC(GetDesktopWindow());
+    HDC virtualDC = CreateCompatibleDC(windowDC);
+    ScreenX = GetDeviceCaps(windowDC, HORZRES);
+    ScreenY = GetDeviceCaps(windowDC, VERTRES);
+    HBITMAP bitmapHandle = CreateCompatibleBitmap(windowDC, ScreenX, ScreenY);
+    HGDIOBJ hOld = SelectObject(virtualDC, bitmapHandle);
+    BitBlt(virtualDC, 0, 0, ScreenX, ScreenY, windowDC, 0, 0, SRCCOPY);    Sleep(2000);
+    BITMAPINFOHEADER bitmap = {0};
+    bitmap.biSize = sizeof(BITMAPINFOHEADER);
+    bitmap.biPlanes = 1;
+    bitmap.biBitCount = 32;
+    bitmap.biWidth = ScreenX;
+    bitmap.biHeight = -ScreenY;
+    bitmap.biCompression = BI_RGB;
+    bitmap.biSizeImage = 0;
 
-    windowDC = GetDC(initWindow);
-    virtualDC = CreateCompatibleDC(windowDC);
-    GetWindowRect(initWindow, &rect);
-    maxWidth = rect.right;
-    maxHeight = rect.bottom;
-
-    bitmap.bmiHeader.biSize = sizeof(bitmap.bmiHeader);
-    bitmap.bmiHeader.biWidth = maxWidth;
-    bitmap.bmiHeader.biHeight = maxHeight;
-    bitmap.bmiHeader.biPlanes = 1;
-    bitmap.bmiHeader.biBitCount = 32;
-    bitmap.bmiHeader.biCompression = BI_RGB;
-    bitmap.bmiHeader.biSizeImage = maxWidth * 4 * maxHeight;
-    bitmap.bmiHeader.biClrUsed = 0;
-    bitmap.bmiHeader.biClrImportant = 0;
-
-    bitmapHandle = CreateDIBSection(virtualDC, &bitmap, DIB_RGB_COLORS, (void**)(&bitPointer), NULL, 0);
-    SelectObject(virtualDC, bitmapHandle);
-    BitBlt(virtualDC, 0, 0, maxWidth, maxHeight, windowDC, 0, 0, SRCCOPY);
+    if (bitPointer)
+        free(bitPointer);
+    bitPointer =  (BYTE*)malloc(4 * ScreenX * ScreenY);
+    GetDIBits(virtualDC, bitmapHandle, 0, ScreenY, bitPointer, (BITMAPINFO*)&bitmap, DIB_RGB_COLORS);
+    ReleaseDC(GetDesktopWindow(), windowDC);
+    DeleteDC(virtualDC);
+    DeleteObject(bitmapHandle);
     return true;
-}
+}     
 
 void minesweeperGame::printDimensions()
 {
-    std::cout << "Width: " << maxWidth;
-    std::cout << "Height: " << maxHeight << std::endl;
+    std::cout << "Width: " << ScreenX;
+    std::cout << "Height: " << ScreenY << std::endl;
     return;
 }
+bool ButtonPress(int Key)
+{
+    bool button_pressed = false;
 
+    while (GetAsyncKeyState(Key))
+        button_pressed = true;
+
+    return button_pressed;
+}
 int main()
 {
-    int width = GetSystemMetrics(SM_CXSCREEN);
-    int height = GetSystemMetrics(SM_CYSCREEN);
-
     minesweeperGame game;
-    game.initializeGame();
-    game.MapGame();
-    char selection;
-    Sleep(5000);
-    ShowWindow(game.initWindow, SW_SHOWMAXIMIZED);
-
     POINT p;
-    p.x = 0; 
-    p.y = 0;
-    ClientToScreen(game.initWindow, &p);
-    std::cout << "X| " << p.x << " Y| " << p.y << std::endl;
+    //SShowWindow(game.initWindow, SW_SHOWMAXIMIZED);
+            //game.initializeGame();
+
+    while (true)
+    {
+        if (ButtonPress(VK_SPACE))
+        {
+            game.MapGame();
+            GetCursorPos(&p);
+            game.printColor(&p);
+            Sleep(50);
+        }
+    }
+    std::cout << "You win!" << std::endl;
     return 0;
 }
