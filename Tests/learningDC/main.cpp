@@ -24,15 +24,15 @@ private:
 };
 inline int minesweeperGame::PosB(int x, int y)
 {
-    return bitPointer[4*((y*ScreenX) + x + 3)];
+    return bitPointer[4*((y*ScreenX) + x)];
 }
 inline int minesweeperGame::PosG(int x, int y)
 {
-    return bitPointer[4*((y*ScreenX) + x) + 2];
+    return bitPointer[4*((y*ScreenX) + x) + 1];
 }
 inline int minesweeperGame::PosR(int x, int y)
 {
-    return bitPointer[4*((y*ScreenX) + x) + 1];
+    return bitPointer[4*((y*ScreenX) + x) + 2];
 }
 void minesweeperGame::printColor(POINT* p)
 {
@@ -71,7 +71,8 @@ void minesweeperGame::initializeGame()
 
 
 bool minesweeperGame::MapGame()
-{
+{   
+    SetProcessDPIAware();
     HDC windowDC = GetDC(GetDesktopWindow());
     HDC virtualDC = CreateCompatibleDC(windowDC);
     ScreenX = GetDeviceCaps(windowDC, HORZRES);
