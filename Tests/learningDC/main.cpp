@@ -10,6 +10,7 @@ public:
     bool MapGame();
     void printDimensions();
     void printColor(POINT*);
+    void SearchFor(int, int, int);
 private:
     //LPCWSTR windowName = L"Microsoft Minesweeper";
     BYTE* bitPointer;
@@ -22,6 +23,21 @@ private:
     
 
 };
+void minesweeperGame::SearchFor(int inR, int inG, int inB)
+{
+    for (int i = 0; i < (ScreenX * ScreenY * 4); i+=4)
+    {
+        if ((int)bitPointer[i] == inB && (int)bitPointer[i+1] == inG && (int)bitPointer[i+2] == inR)
+        {
+            i /= 4;
+            SetCursorPos((i%ScreenX) ,(i /ScreenX));
+            std::cout << "Screenx = " << ScreenX << " ScreenY  = " << ScreenY << std::endl;
+            std::cout << "i = " << i << "  X| " <<  i % (ScreenX * 4) << "  Y| " << i / (ScreenX * 4) << std::endl;
+            break;
+        }
+    }
+}
+
 inline int minesweeperGame::PosB(int x, int y)
 {
     return bitPointer[4*((y*ScreenX) + x)];
@@ -123,12 +139,22 @@ int main()
 
     while (true)
     {
-        if (ButtonPress(VK_SPACE))
+        if (ButtonPress(VK_NUMPAD0))
         {
             game.MapGame();
             GetCursorPos(&p);
             game.printColor(&p);
             Sleep(50);
+        }
+        if (ButtonPress(VK_NUMPAD1))
+        {
+            game.MapGame();
+            game.SearchFor(28, 187, 222);
+        }
+        if (ButtonPress(VK_NUMPAD2))
+        {
+            game.MapGame();
+            game.SearchFor(118, 154, 33);
         }
     }
     std::cout << "You win!" << std::endl;
