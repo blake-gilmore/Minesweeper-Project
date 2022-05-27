@@ -11,18 +11,23 @@ public:
     void printDimensions();
     void printColor(POINT*);
     void SearchFor(int, int, int);
+    void findSquare();
 private:
     //LPCWSTR windowName = L"Microsoft Minesweeper";
     BYTE* bitPointer;
     int ScreenX;
     int ScreenY;
     bool gameWin;
+    int TopY;
+    int RightX;
     inline int PosB(int, int);
     inline int PosG(int, int);
     inline int PosR(int, int);
-    
-
+    void FindTop();
+    void FindRight();
 };
+
+
 void minesweeperGame::SearchFor(int inR, int inG, int inB)
 {
     for (int i = 0; i < (ScreenX * ScreenY * 4); i+=4)
@@ -37,6 +42,20 @@ void minesweeperGame::SearchFor(int inR, int inG, int inB)
         }
     }
 }
+
+void minesweeperGame::findSquare()
+{
+    //Go to middle of actual map
+    //Check a portion of 20 pixels(80 bytes) every Y value increasing by 1 Y value each time
+    //Once Y value of first row is found, map out length of square and document
+    //Calculate center of square
+    //Move left until no more squares
+    //Document that location
+    //Move right until no more squares
+    //Move down until no more squares
+    //Save dimensions into a pointer of squares
+}
+
 
 inline int minesweeperGame::PosB(int x, int y)
 {
@@ -61,7 +80,6 @@ void minesweeperGame::printColor(POINT* p)
     std::cout << "Red: " << red << "  Green: " << green << "  Blue: " << blue << std::endl;
     return;
 }
-
 minesweeperGame::minesweeperGame()
 {
     ScreenX = 0;
@@ -70,8 +88,6 @@ minesweeperGame::minesweeperGame()
     gameWin = false;
     return;
 }
-
-
 void minesweeperGame::initializeGame()
 {/*
     initWindow = FindWindow(NULL, windowName);
@@ -84,10 +100,9 @@ void minesweeperGame::initializeGame()
     std::cout << "Window Found!\n";*/
     return;
 }
-
-
 bool minesweeperGame::MapGame()
 {   
+    //Creates a bitmap for the current desktop window
     SetProcessDPIAware();
     HDC windowDC = GetDC(GetDesktopWindow());
     HDC virtualDC = CreateCompatibleDC(windowDC);
@@ -105,16 +120,52 @@ bool minesweeperGame::MapGame()
     bitmap.biCompression = BI_RGB;
     bitmap.biSizeImage = 0;
 
+    //bitPointer points to new array of color information
     if (bitPointer)
-        free(bitPointer);
+    free(bitPointer);
     bitPointer =  (BYTE*)malloc(4 * ScreenX * ScreenY);
     GetDIBits(virtualDC, bitmapHandle, 0, ScreenY, bitPointer, (BITMAPINFO*)&bitmap, DIB_RGB_COLORS);
     ReleaseDC(GetDesktopWindow(), windowDC);
     DeleteDC(virtualDC);
     DeleteObject(bitmapHandle);
+
+
+    //Find TopEnd and document
+    FindTop();
+
+    //Find RightStart and document
+    FindRight();
+
     return true;
 }     
-
+void minesweeperGame::FindTop()
+{
+    //Start at bitPointer[0];
+    //Add ScreenX * 4 to bitPointer until RGB isn't 255 255 255
+    int index(0);
+    while(bitPointer[index] > 100)
+    {
+        index += (ScreenX * 4);
+    }
+    index /= 4;
+    TopY = index / ScreenX;
+    return;
+}
+void minesweeperGame::FindRight()
+{
+    //start at Y = TopY, and move right pixel by pixel until it finds a Blue value
+    //Record X value into RightX
+    int index(TopY * ScreenX * 4);
+    while(bitPointer[index] < 100)
+    {
+        index += 4;
+    }
+    SetCursorPos((index / 4) % ScreenX, (index / 4) / ScreenX);
+    Sleep(2000);
+    index /= 4;
+    RightX = index % ScreenX;
+    return;
+}
 void minesweeperGame::printDimensions()
 {
     std::cout << "Width: " << ScreenX;
@@ -155,6 +206,16 @@ int main()
         {
             game.MapGame();
             game.SearchFor(118, 154, 33);
+        }
+        if (ButtonPress(VK_NUMPAD3))
+        {
+            game.MapGame();
+            game.findSquare();
+        }
+        if (ButtonPress(VK_NUMPAD4))
+        {
+            game.MapGame();
+            game.PointCorner();
         }
     }
     std::cout << "You win!" << std::endl;
