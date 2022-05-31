@@ -77,7 +77,7 @@ int main()
             game.MapGame();
          while(true)   
          {  
-             Sleep(3000);
+            /* Sleep(3000);
             std::cout << "Enter row: ";
             std::cin >> tempNum;
             std::cout << "Enter column: ";
@@ -85,7 +85,11 @@ int main()
             Sleep(3000);
             game.findSquareValue(game.mapSquares[tempNum][tempNum2]);
             std::cout << "Value in square is: ";
-            std::cout << game.mapSquares[tempNum][tempNum2].getValue() << std::endl;
+            std::cout << game.mapSquares[tempNum][tempNum2].getValue() << std::endl;*/
+
+            game.MapGame();
+            game.MakeMove();
+            game.ClearClicks();
         }
 
             do

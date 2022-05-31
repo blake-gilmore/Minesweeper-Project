@@ -20,6 +20,18 @@ public:
     int getYCoord();
     char getValue();
     void setValue(char);
+    mineSquare* getTopLeft();
+    mineSquare* getTop();
+    mineSquare* getTopRight( );
+    mineSquare* getLeft( );
+    mineSquare* getRight( );
+    mineSquare* getBottomLeft( );
+    mineSquare* getBottom( );
+    mineSquare* getBottomRight( );
+    void findPossibilities();
+    void flagPossibilities();
+    int getPossibilities();
+    int possibilities;
 private:
     int xCoord;
     int yCoord;
@@ -32,5 +44,7 @@ private:
     mineSquare* bottomLeft;
     mineSquare* bottom;
     mineSquare* bottomRight;
+    static int caseMarkers;
 };
+int mineSquare::caseMarkers = 0;
 #endif

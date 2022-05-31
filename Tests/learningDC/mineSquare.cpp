@@ -4,7 +4,20 @@ mineSquare::mineSquare()
 {
     topLeft = top = topRight = left = right = bottomLeft = bottom = bottomRight = nullptr;
     value = 'e';
+    possibilities = 0;
     return;
+}
+void mineSquare::findPossibilities()
+{
+
+}
+void mineSquare::flagPossibilities()
+{
+
+}
+int mineSquare::getPossibilities()
+{
+    return possibilities;
 }
 void mineSquare::setTopLeft(mineSquare* ptrIn)
 {
@@ -76,4 +89,35 @@ char mineSquare::getValue()
     return value;
 }
 
-
+mineSquare* mineSquare::getTopLeft()
+{
+    return topLeft;
+}
+mineSquare* mineSquare::getTop()
+{
+    return top;
+}
+mineSquare* mineSquare::getTopRight()
+{
+    return topRight;
+}
+mineSquare*mineSquare:: getLeft()
+{
+    return left;
+}
+mineSquare* mineSquare::getRight()
+{
+    return right;
+}
+mineSquare*mineSquare:: getBottomLeft()
+{
+    return bottomLeft;
+}
+mineSquare* mineSquare::getBottom()
+{
+    return bottom;
+}
+mineSquare* mineSquare::getBottomRight()
+{
+    return bottomRight;
+}

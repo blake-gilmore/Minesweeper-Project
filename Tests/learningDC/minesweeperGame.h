@@ -2,6 +2,7 @@
 #define MINESWEEPERGAME_H
 #include "mineSquare.h"
 #include <vector>
+
 class minesweeperGame
 {
 public:
@@ -18,9 +19,12 @@ public:
     void MakeMove(int, int);
     int getGameRows();
     int getGameColumns();
+    void findPossibilities(mineSquare&, int, int);
+    void flagPossibilities(mineSquare&, int, int);
+    void testCases(mineSquare&);
     mineSquare** mapSquares;
     void findSquareValue(mineSquare&);
-
+    void flagSquare(int, int);
 private:
     //LPCWSTR windowName = L"Microsoft Minesweeper";
     int numMines;
