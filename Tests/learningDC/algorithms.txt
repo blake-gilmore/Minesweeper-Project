@@ -18,9 +18,11 @@
     9. Loop
         a. Subtract 4 bytes
         b. If blue value drops below 100, mark as LeftOfFirstSquare and exit
+        -----
     10. Loop
         a. Add 4 bytes
         b. If blue value drops below 100, mark as RightOfFirstSquare and exit
+        ----
     11. Move to midpoint between Left and MiddleOfFirstSquare
     12.Loop
         a. Subtract Y value 
@@ -28,6 +30,10 @@
     13. Loop
         a. Add Y value
         b. If blue value drops below 100, reinitialize as BottomOfFirstSquare
+
+
+
+        
     14. Go to midpoint between Top,Bottom, Left, and Right
     15. Reinitialize as MiddleOfFirstSquare
     16. Loop

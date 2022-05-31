@@ -1,6 +1,226 @@
 #include <windows.h>
 #include <iostream>
 #include "minesweeperGame.h"
+void minesweeperGame::setNumMines(int numIn)
+{
+    numMines = numIn;
+}
+int minesweeperGame::getNumMines()
+{
+    return numMines;
+}
+int minesweeperGame::getGameRows()
+{
+    return gameRows;
+}
+int minesweeperGame::getGameColumns()
+{
+    return gameColumns;
+}
+bool isLost()
+{
+    return false;
+}
+void minesweeperGame::MakeMove(int xChange, int yChange)
+{
+    //Recursive function that sends the location of a recently identified square that has changed its value
+    //Has just been recently mapped, so start at current
+
+    //Find new value of current square
+    findSquareValue(mapSquares[xChange][yChange]);
+
+    //Check top left to see if new value
+    //If new value, call MakeMove(xCoord, yCoord);
+
+    //Check top, and so forth
+
+    //Once all have been checked and returned, check if the clicks vector is empty
+    //If it is, and the number of mines is not zero, then there must be a problem
+    return;
+}
+void minesweeperGame::findSquareValue(mineSquare& mineIn)
+{
+    //Find value of current square
+    
+    if (mineIn.getValue() != 'e')
+    {
+        return;
+    }
+    //Check for any white on one line
+
+
+    //Calculate byte value of pixels
+    //1: R 25, G 188, B 223
+    //2: 117, 151, 32
+    //3: 228, 74, 134
+
+    //To Check for white, rgb over 200
+
+    //For one, go to rightmost side, and trace down
+    //For 2, follow straightness of bottom 
+
+    //For 3, 
+
+    //Start at top right corner of square
+    //Get right, get top
+    int byteValue = getXYByte(mineIn.getXCoord(), mineIn.getYCoord());
+    byteValue += (bytesBetweenSquares / 2);
+    while (byteValue % 4 != 0)
+        byteValue--;
+    do
+    {
+        byteValue-=4;
+    }while (bitPointer[byteValue] < 50);
+    if (!isWhite(byteValue-8))
+        return;
+
+    do
+    {
+        byteValue -= (ScreenX * 4);
+    } while (bitPointer[byteValue] > 25);
+
+    //Have top right, now go diagonally down left while white
+
+    //Move until isWhite
+    do
+    {
+        byteValue -= 4;
+        byteValue += (ScreenX * 4);
+    }while (!isWhite(byteValue));
+
+    while(isWhite((byteValue - 4) + ScreenX*4))
+    {
+        byteValue -= 4;
+        byteValue += (ScreenX * 4);
+    }
+    
+    /*//Now Trace
+    int xChange;
+    int initY, afterY;
+    initY = afterY = bytesToPixelsY(byteValue);
+
+    //First, trace until y starts to go downward
+    /*
+    do
+    {
+        initY = afterY;
+        //Check for Y change
+        byteValue += 4;
+        if (isWhite(byteValue))
+        {
+            byteValue -= 4;
+            break;
+        }
+        byteValue -= (ScreenX * 4);
+        afterY = bytesToPixelsY(byteValue);
+        SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+        Sleep(500);
+    } while (afterY <= initY);
+    */
+    
+    //Move down until either, x moves in the positive, or the next y is past the number
+    //If the next Y is past the number
+    //Call moveDownNumber function with 2 flags isXChanged, isCurved
+
+    bool isCurved(false);
+    moveDownNumber(byteValue, isCurved);
+
+    //Check for number 1
+    //isXChanged is no, is Curved is no
+    //Next y value down should be white, otherwise it's a 4
+    if (isCurved == false)
+    {
+        if (isWhite(byteValue + (ScreenX * 4)))
+        {
+            mineIn.setValue('1');
+        }
+        else
+            mineIn.setValue('4');
+        return;
+    }
+
+    //Check for 2 and 3
+    //If 2, then the next movements should be in a straight line
+    //Otherwise, it's a 3
+    if (isWhite(byteValue + 12 + (ScreenX * 4) * 3))
+        mineIn.setValue('3');
+
+    else
+        mineIn.setValue('2');
+    return;
+}
+
+void minesweeperGame::moveDownNumber(int& byteValue, bool& isCurved)
+{
+    int initX = bytesToPixelsX(byteValue);
+    int postX = 0;
+    bool negativeChange(false);
+
+    //Move down by Y
+    //If white, try moving left 2 pixels to find a non-white value
+    //  If not possible, then this is a 1 value, return
+    //  If possible, then make negativeChange = true
+    //  check if postX differs by 2 or more pixels, if it does, change isCurved to true
+    //and loop again
+    //If nonwhite, try moving right 2 pixels to find white value
+    //  if possible, check if negativeChange == true
+    //      if false, then move and loop
+    //      if true, then return
+    //  if not possible, return
+    do
+    {
+        //byteValue += (ScreenX * 4);
+        if (isWhite(byteValue + (ScreenX * 4)))
+        {
+            byteValue += ScreenX * 4;
+            if (isWhite(byteValue - 12))
+                return;
+            else if (isWhite(byteValue - 8))
+            {
+                byteValue -= 8;
+                postX -= 2;
+            }
+            else if (isWhite(byteValue - 4))
+            {
+                byteValue -= 4;
+                postX --;
+            }
+            if (postX < -2)
+            {
+                isCurved = true;
+                negativeChange = true;
+            }
+        }
+        else
+        {
+            if (negativeChange == true)
+            {
+                return;
+            }
+            else
+            {
+                if (!isWhite(byteValue + 12 + (ScreenX * 4)))
+                {
+                    return;
+                }
+                if (isWhite(byteValue + 4 + (ScreenX * 4)))
+                {
+                    byteValue += 4 + (ScreenX * 4);
+                    postX++;
+                }
+                else if (isWhite(byteValue + 8 + (ScreenX * 4)))
+                {
+                    byteValue += 8 + (ScreenX * 4);
+                    postX+= 2;
+                }
+                if (postX > 2)
+                    isCurved = true;
+            }
+        }
+
+    } while (true);
+    return;
+}
 
 void minesweeperGame::SearchFor(int inR, int inG, int inB)
 {
@@ -9,12 +229,17 @@ void minesweeperGame::SearchFor(int inR, int inG, int inB)
         if ((int)bitPointer[i] == inB && (int)bitPointer[i+1] == inG && (int)bitPointer[i+2] == inR)
         {
             i /= 4;
-            SetCursorPos((i%ScreenX) ,(i /ScreenX));
             std::cout << "Screenx = " << ScreenX << " ScreenY  = " << ScreenY << std::endl;
             std::cout << "i = " << i << "  X| " <<  i % (ScreenX * 4) << "  Y| " << i / (ScreenX * 4) << std::endl;
             break;
         }
     }
+}
+bool minesweeperGame::isWhite(int byteValue)
+{
+    if (bitPointer[byteValue] > 100 && bitPointer[byteValue+1] > 100 && bitPointer[byteValue+2] > 100)
+        return true;
+    return false;
 }
 
 void minesweeperGame::initMap()
@@ -98,18 +323,13 @@ void minesweeperGame::initMap()
         }
     }while(topOfFirstSquare == 0);
     
-    SetCursorPos(bytesToPixelsX(topOfFirstSquare), bytesToPixelsY(topOfFirstSquare));
-    Sleep(5000);
 
     //Find bottom of the first square
     int BottomOfFirstSquare = topOfFirstSquare;
     do
     {
         BottomOfFirstSquare += (ScreenX * 4);
-    } while (bitPointer[BottomOfFirstSquare] >= 100);
-
-    SetCursorPos(bytesToPixelsX(BottomOfFirstSquare), bytesToPixelsY(BottomOfFirstSquare));
-    Sleep(5000);
+    } while (bitPointer[BottomOfFirstSquare] >= 100); 
 
     int middleOfFirstSquare = topOfFirstSquare + ((BottomOfFirstSquare - topOfFirstSquare) / 2);
     while ((middleOfFirstSquare % 4) != 0)
@@ -117,16 +337,25 @@ void minesweeperGame::initMap()
 
     //Find Left of first Square
     int mark = middleOfFirstSquare;
-    SetCursorPos(bytesToPixelsX(middleOfFirstSquare), bytesToPixelsY(middleOfFirstSquare));
-    Sleep(5000);
+    
     do
     {
         mark -= 4;
     } while (bitPointer[mark] >= 100);
     int leftOfFirstSquare = mark;
 
-    SetCursorPos(bytesToPixelsX(mark), bytesToPixelsY(mark));
-    Sleep(5000);
+    //Find length of the black lines
+    int startOfGap = mark;
+    do
+    {
+        mark -= 4;
+
+    } while (bitPointer[mark] <= 100);
+    mark += 4;
+    int bytesOfGaps = startOfGap - mark;
+
+    
+    mark = leftOfFirstSquare;
     
     //Find Right of First Square
     do
@@ -134,12 +363,10 @@ void minesweeperGame::initMap()
         mark += 4;
     }while(bitPointer[mark] >= 100);
     int rightOfFirstSquare = mark;
-
-    SetCursorPos(bytesToPixelsX(mark), bytesToPixelsY(mark));
-    Sleep(5000);
+    
 
     //Refind top of square
-    mark =rightOfFirstSquare + ((rightOfFirstSquare - leftOfFirstSquare)/2);
+    mark =leftOfFirstSquare + ((rightOfFirstSquare - leftOfFirstSquare)/2);
     while ((mark % 4) != 0)
         mark--;
     do
@@ -147,9 +374,7 @@ void minesweeperGame::initMap()
         mark -= (ScreenX * 4);
     }while(bitPointer[mark] >= 100);
     topOfFirstSquare = mark;
-
-    SetCursorPos(bytesToPixelsX(mark), bytesToPixelsY(mark));
-    Sleep(5000);
+    
 
     //Refind bottom of first square
     do
@@ -158,45 +383,38 @@ void minesweeperGame::initMap()
     } while (bitPointer[mark] >= 100);
     BottomOfFirstSquare = mark;
 
-    SetCursorPos(bytesToPixelsX(mark), bytesToPixelsY(mark));
-    Sleep(5000);
+    int startOfGapY = mark;
+    do
+    {
+        mark += (ScreenX * 4);
+    } while (bitPointer[mark]<=100);
+    mark -= (ScreenX * 4);
+    int yGap = mark - startOfGapY; 
 
-    int yMark = topOfFirstSquare + ((BottomOfFirstSquare - topOfFirstSquare) / 2);
-    while ((yMark % 4) != 0)
-        middleOfFirstSquare--;
-    yMark /= 4;
-    yMark /= ScreenX;
+    int yMark = bytesToPixelsY(topOfFirstSquare) + ((bytesToPixelsY(BottomOfFirstSquare) - bytesToPixelsY(topOfFirstSquare)) / 2);
 
-    int xMark =rightOfFirstSquare + ((rightOfFirstSquare - leftOfFirstSquare)/2);
+    int xMark =leftOfFirstSquare + ((rightOfFirstSquare - leftOfFirstSquare)/2);
     while ((xMark % 4) != 0)
         xMark--;
-    xMark /= 4;
-    xMark %= ScreenX;
 
-    mark = (yMark * 4) + (xMark * 4);
-
-    SetCursorPos(bytesToPixelsX(mark), bytesToPixelsY(mark));
-    Sleep(5000);
-
+    mark = pixelsToBytesY(yMark) + (xMark % (ScreenX * 4));
+    
     middleOfFirstSquare = mark;
     do
     {
-        middleOfFirstSquare -= (rightOfFirstSquare - leftOfFirstSquare);
+        middleOfFirstSquare -= (rightOfFirstSquare - leftOfFirstSquare + bytesOfGaps);
     } while (bitPointer[middleOfFirstSquare] >= 100);
-    middleOfFirstSquare += (rightOfFirstSquare - leftOfFirstSquare);
-    
+    middleOfFirstSquare += (rightOfFirstSquare - leftOfFirstSquare + bytesOfGaps);
     leftCorner = middleOfFirstSquare;
 
     //Count squares in entire map
     int counter(0);
     mark = leftCorner;
-    int amountToJumpSide = (rightOfFirstSquare - leftOfFirstSquare);
+
+    int amountToJumpSide = (rightOfFirstSquare - leftOfFirstSquare + bytesOfGaps);
     do
     {   counter++;
         mark += amountToJumpSide;
-
-        SetCursorPos(bytesToPixelsX(mark), bytesToPixelsY(mark));
-        Sleep(5000);
     } while (bitPointer[mark] >= 100);
     
     mark -= amountToJumpSide;
@@ -204,13 +422,11 @@ void minesweeperGame::initMap()
     gameColumns = counter;
     counter = 0;
 
-    int amountToJumpUp = BottomOfFirstSquare - topOfFirstSquare;
+    int amountToJumpUp = BottomOfFirstSquare - topOfFirstSquare + yGap;
     do
     {
         counter++;
         mark += amountToJumpUp;
-        SetCursorPos(bytesToPixelsX(mark), bytesToPixelsY(mark));
-        Sleep(5000);
     } while (bitPointer[mark] >= 100);
     mark -= amountToJumpUp;
     gameRows = counter;
@@ -222,14 +438,23 @@ void minesweeperGame::initMap()
         mapSquares[i] = new mineSquare[gameColumns];
     }
     mineSquare* minePtr;
-    pixelsBetweenSquares = ((rightOfFirstSquare - leftOfFirstSquare) / 4);
+    bytesBetweenSquares = rightOfFirstSquare - leftOfFirstSquare;
     mark  = leftCorner;
     for (int row = 0; row < gameRows; row++)
     {
+
         mark = leftCorner;
-        mark += (pixelsToBytesY(pixelsBetweenSquares) * row);
+        
+        for (int i = 0; i < row; i++)
+        {
+            mark += amountToJumpUp;
+            mark = findCenterY(mark);
+            
+
+        }
         for (int column = 0; column < gameColumns; column++)
         {
+            mark = findCenterX(mark);
             //Determine placement in array and assign NULL if on edges, and the addresses of
             //near squares otherwise
             if (row == 0)
@@ -307,20 +532,10 @@ void minesweeperGame::initMap()
             //Set xCoord and yCoords of current mark
             mapSquares[row][column].setXCoord(bytesToPixelsX(mark));
             mapSquares[row][column].setYCoord(bytesToPixelsY(mark));
-
-            mark += pixelsToBytesX(pixelsBetweenSquares);
-        }
-
-        
+            mark += amountToJumpSide;
+        }   
     }
-
-    
-    
-
-
 }
-
-
 inline int minesweeperGame::PosB(int x, int y)
 {
     return bitPointer[4*((y*ScreenX) + x)];
@@ -374,7 +589,7 @@ bool minesweeperGame::MapGame()
     ScreenY = GetDeviceCaps(windowDC, VERTRES);
     HBITMAP bitmapHandle = CreateCompatibleBitmap(windowDC, ScreenX, ScreenY);
     HGDIOBJ hOld = SelectObject(virtualDC, bitmapHandle);
-    BitBlt(virtualDC, 0, 0, ScreenX, ScreenY, windowDC, 0, 0, SRCCOPY);    Sleep(2000);
+    BitBlt(virtualDC, 0, 0, ScreenX, ScreenY, windowDC, 0, 0, SRCCOPY);
     BITMAPINFOHEADER bitmap = {0};
     bitmap.biSize = sizeof(BITMAPINFOHEADER);
     bitmap.biPlanes = 1;
@@ -424,8 +639,7 @@ void minesweeperGame::FindRight()
     {
         index += 4;
     }
-    SetCursorPos((index / 4) % ScreenX, (index / 4) / ScreenX);
-    Sleep(2000);
+    
     index /= 4;
     RightX = index % ScreenX;
     return;
@@ -436,8 +650,6 @@ void minesweeperGame::printDimensions()
     std::cout << "Height: " << ScreenY << std::endl;
     return;
 }
-
-
 int minesweeperGame::pixelsToBytesX(int pixelsIn)
 {
     return (pixelsIn * 4);
@@ -448,9 +660,52 @@ int minesweeperGame::pixelsToBytesY(int pixelsIn)
 }
 int minesweeperGame::bytesToPixelsX(int bytesIn)
 {
-    return (bytesIn % (ScreenX * 4));
+    return ((bytesIn / 4) % ScreenX);
 }
 int minesweeperGame::bytesToPixelsY(int bytesIn)
 {
-    return (bytesIn / (ScreenX * 4));
+    return ((bytesIn / 4) / ScreenX);
+}
+int minesweeperGame::findCenterX(int byteIn)
+{
+    do 
+    {
+        byteIn -= 4;
+    }while(bitPointer[byteIn] >= 100);
+    int leftCoord = byteIn;
+    do
+    {
+        byteIn += 4;
+    } while(bitPointer[byteIn] >= 100);
+
+    int rightCoord = byteIn;
+
+    return (leftCoord + ((rightCoord - leftCoord)/2));
+}
+int minesweeperGame::findCenterY(int byteIn)
+{
+    do 
+    {
+        byteIn -= (4 * ScreenX);
+    }while(bitPointer[byteIn] >= 100);
+    int topCoord = byteIn;
+    
+    do
+    {
+        byteIn += (4 * ScreenX);
+    } while(bitPointer[byteIn] >= 100);
+
+    int bottomCoord = byteIn;
+    int pixelsDown = (bytesToPixelsY(bottomCoord) - bytesToPixelsY(topCoord)) / 2;
+    topCoord = topCoord + (pixelsDown * 4 * ScreenX);
+    while (topCoord % 4 != 0)
+    {
+        topCoord--;
+    }
+    
+    return (topCoord);
+}
+int minesweeperGame::getXYByte(int x, int y)
+{
+    return (pixelsToBytesX(x) + pixelsToBytesY(y));
 }

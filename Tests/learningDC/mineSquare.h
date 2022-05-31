@@ -1,6 +1,6 @@
 #ifndef MINESQUARE_H
 #define MINESQUARE_H
-
+#include <windows.h>
 class mineSquare
 {
 public:
@@ -16,6 +16,10 @@ public:
     void setBottomRight( mineSquare*);
     void setXCoord(int);
     void setYCoord(int);
+    int getXCoord();
+    int getYCoord();
+    char getValue();
+    void setValue(char);
 private:
     int xCoord;
     int yCoord;

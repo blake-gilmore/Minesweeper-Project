@@ -1,7 +1,10 @@
 #include "mineSquare.h"
+#include <windows.h>
 mineSquare::mineSquare()
 {
     topLeft = top = topRight = left = right = bottomLeft = bottom = bottomRight = nullptr;
+    value = 'e';
+    return;
 }
 void mineSquare::setTopLeft(mineSquare* ptrIn)
 {
@@ -47,8 +50,30 @@ void mineSquare::setBottomRight( mineSquare* ptrIn)
 void mineSquare::setXCoord(int xIn)
 {
     xCoord = xIn;
+    return;
 }
 void mineSquare::setYCoord(int yIn)
 {
     yCoord = yIn;
+    return;
 }
+void mineSquare::setValue(char valueIn)
+{
+    value = valueIn;
+    return;
+}
+int mineSquare::getXCoord()
+{
+    return xCoord;
+}
+int mineSquare::getYCoord()
+{
+    return yCoord;
+}
+
+char mineSquare::getValue()
+{
+    return value;
+}
+
+
