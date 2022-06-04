@@ -20,6 +20,8 @@ public:
     int getYCoord();
     char getValue();
     void setValue(char);
+    void setClicked(bool);
+    bool getClicked() {return clicked;};
     mineSquare* getTopLeft();
     mineSquare* getTop();
     mineSquare* getTopRight( );
@@ -32,10 +34,14 @@ public:
     void flagPossibilities();
     int getPossibilities();
     int possibilities;
+    int flagsNear;
+    int column;
+    int row;
 private:
     int xCoord;
     int yCoord;
     char value;
+    bool clicked;
     mineSquare* topLeft;
     mineSquare* top;
     mineSquare* topRight;
@@ -44,7 +50,6 @@ private:
     mineSquare* bottomLeft;
     mineSquare* bottom;
     mineSquare* bottomRight;
-    static int caseMarkers;
+    
 };
-int mineSquare::caseMarkers = 0;
 #endif

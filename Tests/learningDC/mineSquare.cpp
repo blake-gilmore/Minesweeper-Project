@@ -5,6 +5,13 @@ mineSquare::mineSquare()
     topLeft = top = topRight = left = right = bottomLeft = bottom = bottomRight = nullptr;
     value = 'e';
     possibilities = 0;
+    flagsNear = 0;
+    clicked = false;
+    return;
+}
+void mineSquare::setClicked(bool clickIn)
+{
+    clicked = clickIn;
     return;
 }
 void mineSquare::findPossibilities()

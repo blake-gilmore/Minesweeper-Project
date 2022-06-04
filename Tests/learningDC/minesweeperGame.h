@@ -16,15 +16,15 @@ public:
     void setNumMines(int);
     int getNumMines();
     bool isLost();
-    void MakeMove(int, int);
+    void MakeMove(mineSquare&);
     int getGameRows();
     int getGameColumns();
-    void findPossibilities(mineSquare&, int, int);
-    void flagPossibilities(mineSquare&, int, int);
+    void findPossibilities(mineSquare&);
+    void flagPossibilities(mineSquare&);
     void testCases(mineSquare&);
     mineSquare** mapSquares;
     void findSquareValue(mineSquare&);
-    void flagSquare(int, int);
+    void flagSquare(mineSquare&);
 private:
     //LPCWSTR windowName = L"Microsoft Minesweeper";
     int numMines;
@@ -52,6 +52,9 @@ private:
     int getXYByte(int x, int y);
     bool isWhite(int);
     void moveDownNumber(int&, bool&);
-    std::vector<std::vector<int>> coordsOfClicks;
+    void clickEmpties(mineSquare&);
+    void clickSquare(mineSquare&);
+
+    //std::vector<std::vector<>> coordsOfClicks;
 };
 #endif

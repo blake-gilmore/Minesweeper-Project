@@ -62,7 +62,7 @@ int main()
         {
             //std::cout << "Enter the number of mines on this map: ";
             //std::cin >> tempNum;
-            Sleep(2000);
+            
             game.setNumMines(tempNum);
             game.MapGame();
             game.initMap();
@@ -70,14 +70,15 @@ int main()
             tempNum = rand() % game.getGameRows();
             tempNum2 = rand() % game.getGameColumns();
             
-            SetCursorPos(game.mapSquares[0][1].getXCoord(), game.mapSquares[0][1].getYCoord());
+            SetCursorPos(game.mapSquares[tempNum][tempNum2].getXCoord(), game.mapSquares[tempNum][tempNum2].getYCoord());
             Sleep(50);
             leftClick();
             Sleep(500);
+
             game.MapGame();
          while(true)   
          {  
-            /* Sleep(3000);
+             /*Sleep(3000);
             std::cout << "Enter row: ";
             std::cin >> tempNum;
             std::cout << "Enter column: ";
@@ -86,16 +87,16 @@ int main()
             game.findSquareValue(game.mapSquares[tempNum][tempNum2]);
             std::cout << "Value in square is: ";
             std::cout << game.mapSquares[tempNum][tempNum2].getValue() << std::endl;*/
-
             game.MapGame();
-            game.MakeMove();
-            game.ClearClicks();
+            game.MakeMove(game.mapSquares[tempNum][tempNum2]);
+            exit;
+            //game.ClearClicks();
         }
 
             do
             {
                 game.MapGame();
-                game.MakeMove(tempNum, tempNum2);
+                game.MakeMove(game.mapSquares[tempNum][tempNum2]);
             }while(game.getNumMines() > 0);
 
         }
