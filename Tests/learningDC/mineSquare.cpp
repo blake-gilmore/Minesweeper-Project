@@ -14,14 +14,6 @@ void mineSquare::setClicked(bool clickIn)
     clicked = clickIn;
     return;
 }
-void mineSquare::findPossibilities()
-{
-
-}
-void mineSquare::flagPossibilities()
-{
-
-}
 int mineSquare::getPossibilities()
 {
     return possibilities;

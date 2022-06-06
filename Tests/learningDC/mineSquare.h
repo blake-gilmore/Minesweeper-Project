@@ -30,8 +30,6 @@ public:
     mineSquare* getBottomLeft( );
     mineSquare* getBottom( );
     mineSquare* getBottomRight( );
-    void findPossibilities();
-    void flagPossibilities();
     int getPossibilities();
     int possibilities;
     int flagsNear;
