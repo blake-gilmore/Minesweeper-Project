@@ -25,6 +25,9 @@ public:
     mineSquare** mapSquares;
     void findSquareValue(mineSquare&);
     void flagSquare(mineSquare&);
+    void updateFlags(mineSquare&);
+    void updatePossibilities(mineSquare&);
+    int bytesBetweenSquares;
 private:
     //LPCWSTR windowName = L"Microsoft Minesweeper";
     int numMines;
@@ -37,7 +40,7 @@ private:
     int leftCorner;
     int gameRows;
     int gameColumns;
-    int bytesBetweenSquares;
+    
     inline int PosB(int, int);
     inline int PosG(int, int);
     inline int PosR(int, int);

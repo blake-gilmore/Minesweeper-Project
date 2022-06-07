@@ -42,8 +42,8 @@ private:
     bool clicked;
     mineSquare* topLeft;
     mineSquare* top;
-    mineSquare* topRight;
     mineSquare* left;
+    mineSquare* topRight;
     mineSquare* right;
     mineSquare* bottomLeft;
     mineSquare* bottom;

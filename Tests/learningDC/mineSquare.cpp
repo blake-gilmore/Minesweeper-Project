@@ -13,7 +13,7 @@ void mineSquare::setClicked(bool clickIn)
 {
     clicked = clickIn;
     return;
-}
+}   
 int mineSquare::getPossibilities()
 {
     return possibilities;
