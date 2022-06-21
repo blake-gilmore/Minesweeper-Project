@@ -628,7 +628,25 @@ char minesweeperGame::getColor(int byteValue)
     else
         return 'r';
 }
+void minesweeperGame::checkBlue(mineSquare& mineIn, int byteValue)
+{
+    while (!isWhite(byteValue-4) || !isWhite(byteValue + ScreenX * 4))
+        byteValue += (ScreenX * 4);
 
+    if (isWhite(byteValue - 4))
+        mineIn.setValue('1');
+    else
+        mineIn.setValue('4');
+    return;
+}
+void minesweeperGame::checkRed(mineSquare& mineIn, int byteValue)
+{
+    return;
+}
+void minesweeperGame::checkGreen(mineSquare& mineIn, int byteValue)
+{
+    return;
+}
 void minesweeperGame::findSquareValue(mineSquare& mineIn)
 {
     //Find value of current square
@@ -709,11 +727,11 @@ void minesweeperGame::findSquareValue(mineSquare& mineIn)
 
     char color = getColor((byteValue - 4) + ScreenX*4);
     if (color == 'b')
-        checkBlue(mineIn);
+        checkBlue(mineIn, byteValue);
     else if (color == 'g')
-        checkGreen(mineIn);
+        checkGreen(mineIn, byteValue);
     else
-        checkRed(mineIn);
+        checkRed(mineIn, byteValue);
 
     bool isCurved(false);
     int postX(0);

@@ -62,9 +62,9 @@ private:
     void clickEmpties(mineSquare&);
     void clickSquare(mineSquare&);
     char getColor(int);
-    void checkBlue(mineSquare&);
-    void checkRed(mineSquare&);
-    void checkGreen(mineSquare&);
+    void checkBlue(mineSquare&, int);
+    void checkRed(mineSquare&, int);
+    void checkGreen(mineSquare&, int);
 
     std::vector<mineSquare*> coordsOfClicks;
 };
