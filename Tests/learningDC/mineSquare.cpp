@@ -1,4 +1,5 @@
 #include "mineSquare.h"
+#include <iostream>
 #include <windows.h>
 mineSquare::mineSquare()
 {
@@ -7,7 +8,24 @@ mineSquare::mineSquare()
     possibilities = 0;
     flagsNear = 0;
     clicked = false;
+    adjacents = new mineSquare*[8];
+    adjacents[0] = topLeft;
+    adjacents[1] = top;
+    adjacents[2] = topRight;
+    adjacents[3] = left;
+    adjacents[4] = right;
+    adjacents[5] = bottomLeft;
+    adjacents[6] = bottom;
+    adjacents[7] = bottomRight;
+    
     return;
+}
+void mineSquare::printSquare()
+{
+    std::cout << "Value: " << value << std::endl;
+    std::cout << "Possibilities: " << possibilities << std::endl;
+    std::cout << "Flags Near: " << flagsNear << std::endl;
+    
 }
 void mineSquare::setClicked(bool clickIn)
 {

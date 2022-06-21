@@ -6,6 +6,7 @@ class mineSquare
 public:
 
     mineSquare();
+    void printSquare();
     void setTopLeft(mineSquare*);
     void setTop(mineSquare*);
     void setTopRight( mineSquare*);
@@ -35,11 +36,13 @@ public:
     int flagsNear;
     int column;
     int row;
+    mineSquare** adjacents;
 private:
     int xCoord;
     int yCoord;
     char value;
     bool clicked;
+    
     mineSquare* topLeft;
     mineSquare* top;
     mineSquare* left;

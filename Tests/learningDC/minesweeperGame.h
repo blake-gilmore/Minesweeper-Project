@@ -27,7 +27,10 @@ public:
     void flagSquare(mineSquare&);
     void updateFlags(mineSquare&);
     void updatePossibilities(mineSquare&);
+    bool isRed(int);
     int bytesBetweenSquares;
+    int squareHeight;
+    void clearClicks();
 private:
     //LPCWSTR windowName = L"Microsoft Minesweeper";
     int numMines;
@@ -54,10 +57,15 @@ private:
     int findCenterY(int);
     int getXYByte(int x, int y);
     bool isWhite(int);
+    bool isBlue(int);
     void moveDownNumber(int&, bool&);
     void clickEmpties(mineSquare&);
     void clickSquare(mineSquare&);
+    char getColor(int);
+    void checkBlue(mineSquare&);
+    void checkRed(mineSquare&);
+    void checkGreen(mineSquare&);
 
-    //std::vector<std::vector<>> coordsOfClicks;
+    std::vector<mineSquare*> coordsOfClicks;
 };
 #endif
