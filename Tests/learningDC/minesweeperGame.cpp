@@ -668,6 +668,38 @@ void minesweeperGame::findSquareValue(mineSquare& mineIn)
     //For 2, follow straightness of bottom 
 
     //For 3, 
+    //Other Way
+
+    int byteValue = getXYByte(mineIn.getXCoord(), mineIn.getYCoord());
+    
+    //Move pixel to 5/6th of the way into the square
+    byteValue += (bytesBetweenSquares / 3);
+    while (byteValue % 4 != 0)
+        byteValue--;
+
+    if (!isWhite(byteValue))
+        return;
+    
+    while(true)
+    {
+        byteValue -= 4;
+        if (!isWhite(byteValue))
+            break;
+        if (bytesToPixelsX(byteValue) < mineIn.getXCoord())
+        {
+            mineIn.setValue('w');
+            return;
+        }
+    }
+    
+    if (isRed(byteValue))
+        checkRed(mineIn, byteValue);
+    else if (isBlue(byteValue))
+        checkBlue(mineIn, byteValue);
+    else 
+        checkGreen(mineIn, byteValue);
+    return;
+
 
     //Start at top right corner of square
     //Get right, get top
@@ -732,6 +764,8 @@ void minesweeperGame::findSquareValue(mineSquare& mineIn)
         checkGreen(mineIn, byteValue);
     else
         checkRed(mineIn, byteValue);
+
+    return;
 
     bool isCurved(false);
     int postX(0);
