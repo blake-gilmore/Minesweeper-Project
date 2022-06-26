@@ -628,19 +628,97 @@ char minesweeperGame::getColor(int byteValue)
     else
         return 'r';
 }
-void minesweeperGame::checkBlue(mineSquare& mineIn, int byteValue)
-{
-    while (!isWhite(byteValue-4) || !isWhite(byteValue + ScreenX * 4))
-        byteValue += (ScreenX * 4);
 
-    if (isWhite(byteValue - 4))
+void minesweeperGame::moveToRightEdge(mineSquare& mineIn, int& byteValue)
+//Precondition: mineIn is an initialized mineSquare object
+//the calling minesweeperGame must have successfully initialized its map and mine values
+//byteValue is a valid integer within the range of the calling minesweeperGame's bitPointer bitMap
+//
+//Postcondition: sets the byteValue to the center-Y value and rightmost edge of the mineIn square
+{
+    byteValue = getXYByte(mineIn.getXCoord(), mineIn.getYCoord());
+    SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+    Sleep(50);
+    byteValue += (bytesBetweenSquares / 2);
+    SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+    Sleep(50);
+    while (byteValue % 4 != 0)
+        byteValue--;
+    do
+    {
+        byteValue-=4;
+        SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+        Sleep(50);
+    }while (bitPointer[byteValue] < 100);
+    return;
+}
+
+void minesweeperGame::checkBlue(mineSquare& mineIn, int byteValue)
+//Precondition: mineIn is of a valid initialized mineSquare object
+//byteValue is number of a pixel within the range of the calling minesweeperGame's bitPointer byte array
+//PostCondition: assigns mineIn's "value" variable to either '1' or '4'
+{
+    moveToRightEdge(mineIn, byteValue);
+    while (isWhite(byteValue - 4))
+    {
+        SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+        Sleep(50);
+        byteValue -= 4;
+    }
+    while (isWhite(byteValue) && !isWhite(byteValue - 4))
+    {
+        SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+        Sleep(50);
+        byteValue += (ScreenX * 4);
+    }
+    if (isWhite(byteValue))
         mineIn.setValue('1');
     else
         mineIn.setValue('4');
+
+    return;
+}
+void minesweeperGame::moveTopEdge(mineSquare& mineIn, int& byteValue)
+{
+    byteValue = getXYByte(mineIn.getXCoord(), mineIn.getYCoord());
+    SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+    Sleep(50);
+    byteValue += (bytesBetweenSquares / 2) * (ScreenX * 4);
+    SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+    Sleep(50);
+    while (byteValue % 4 != 0)
+        byteValue--;
+    do
+    {
+        byteValue+=ScreenX * 4;
+        SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+        Sleep(50);
+    }while (bitPointer[byteValue] < 100);
     return;
 }
 void minesweeperGame::checkRed(mineSquare& mineIn, int byteValue)
 {
+    moveTopEdge(mineIn, byteValue);
+    while (isWhite(byteValue))
+        byteValue += (ScreenX * 4);
+
+    int curveAmount(0);
+    //Move down
+    do
+    {
+        if (isWhite(byteValue + (ScreenX * 4)))
+        {
+            byteValue += ScreenX * 4;
+            curveAmount++;
+        }
+        byteValue += 4;
+    }while (!isWhite(byteValue + 2 * (ScreenX * 4)));
+   
+    if (curveAmount > 1)
+        mineIn.setValue('3');
+    else
+        mineIn.setValue('5');
+    
     return;
 }
 void minesweeperGame::checkGreen(mineSquare& mineIn, int byteValue)
@@ -674,6 +752,8 @@ void minesweeperGame::findSquareValue(mineSquare& mineIn)
     
     //Move pixel to 5/6th of the way into the square
     byteValue += (bytesBetweenSquares / 3);
+    SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+    Sleep(50);
     while (byteValue % 4 != 0)
         byteValue--;
 
@@ -683,6 +763,8 @@ void minesweeperGame::findSquareValue(mineSquare& mineIn)
     while(true)
     {
         byteValue -= 4;
+        SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+        Sleep(50);
         if (!isWhite(byteValue))
             break;
         if (bytesToPixelsX(byteValue) < mineIn.getXCoord())
@@ -703,7 +785,7 @@ void minesweeperGame::findSquareValue(mineSquare& mineIn)
 
     //Start at top right corner of square
     //Get right, get top
-    int byteValue = getXYByte(mineIn.getXCoord(), mineIn.getYCoord());
+    //int byteValue = getXYByte(mineIn.getXCoord(), mineIn.getYCoord());
     byteValue += (bytesBetweenSquares / 2);
     //std::cout << bytesBetweenSquares << std::endl;
     while (byteValue % 4 != 0)

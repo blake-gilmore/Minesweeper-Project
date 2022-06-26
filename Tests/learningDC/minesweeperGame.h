@@ -31,6 +31,7 @@ public:
     int bytesBetweenSquares;
     int squareHeight;
     void clearClicks();
+    void moveToRightEdge(mineSquare&, int&);
 private:
     //LPCWSTR windowName = L"Microsoft Minesweeper";
     int numMines;
@@ -65,6 +66,7 @@ private:
     void checkBlue(mineSquare&, int);
     void checkRed(mineSquare&, int);
     void checkGreen(mineSquare&, int);
+    void moveTopEdge(mineSquare&, int&);
 
     std::vector<mineSquare*> coordsOfClicks;
 };

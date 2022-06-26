@@ -67,7 +67,6 @@ int main()
                 std::cin >> tempNum;
                 std::cout << "Enter column: ";
                 std::cin >> tempNum2;
-                Sleep(3000);
                 game.MapGame();
                 game.findSquareValue(game.mapSquares[tempNum][tempNum2]);
                 std::cout << "Value in square is: ";
