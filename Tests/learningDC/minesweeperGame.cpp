@@ -637,18 +637,18 @@ void minesweeperGame::moveToRightEdge(mineSquare& mineIn, int& byteValue)
 //Postcondition: sets the byteValue to the center-Y value and rightmost edge of the mineIn square
 {
     byteValue = getXYByte(mineIn.getXCoord(), mineIn.getYCoord());
-    SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-    Sleep(50);
+    //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+    //Sleep(50);
     byteValue += (bytesBetweenSquares / 2);
-    SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-    Sleep(50);
+    //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+   // Sleep(50);
     while (byteValue % 4 != 0)
         byteValue--;
     do
     {
         byteValue-=4;
-        SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-        Sleep(50);
+        //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+        //Sleep(50);
     }while (bitPointer[byteValue] < 100);
     return;
 }
@@ -661,14 +661,14 @@ void minesweeperGame::checkBlue(mineSquare& mineIn, int byteValue)
     moveToRightEdge(mineIn, byteValue);
     while (isWhite(byteValue - 4))
     {
-        SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-        Sleep(50);
+       // SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+        //Sleep(50);
         byteValue -= 4;
     }
     while (isWhite(byteValue) && !isWhite(byteValue - 4))
     {
-        SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-        Sleep(50);
+        //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+       // Sleep(50);
         byteValue += (ScreenX * 4);
     }
     if (isWhite(byteValue))
@@ -681,26 +681,47 @@ void minesweeperGame::checkBlue(mineSquare& mineIn, int byteValue)
 void minesweeperGame::moveTopEdge(mineSquare& mineIn, int& byteValue)
 {
     byteValue = getXYByte(mineIn.getXCoord(), mineIn.getYCoord());
-    SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-    Sleep(50);
-    byteValue += (bytesBetweenSquares / 2) * (ScreenX * 4);
-    SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-    Sleep(50);
+    //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+   // Sleep(300);
+    byteValue -= bytesToPixelsX(bytesBetweenSquares / 2) * ScreenX * 4;
+   // SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+    //Sleep(2000);
     while (byteValue % 4 != 0)
         byteValue--;
     do
     {
         byteValue+=ScreenX * 4;
-        SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-        Sleep(50);
+        //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+        //Sleep(50);
     }while (bitPointer[byteValue] < 100);
     return;
+}
+bool minesweeperGame::isWhiteLine(int byteValue, mineSquare& mineIn)
+{
+    bool whiteLine(true);
+    do
+    {
+        byteValue += (ScreenX * 4);
+        //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+        //Sleep(300);
+        if (!isWhite(byteValue))
+        {
+            whiteLine = false;
+            break;
+        }
+    }while (bytesToPixelsY(byteValue) < mineIn.getYCoord());
+
+    return whiteLine;
 }
 void minesweeperGame::checkRed(mineSquare& mineIn, int byteValue)
 {
     moveTopEdge(mineIn, byteValue);
-    while (isWhite(byteValue))
+    do
+    {
         byteValue += (ScreenX * 4);
+        //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+        //Sleep(300);
+    }while (isWhite(byteValue + (ScreenX * 4)));
 
     int curveAmount(0);
     //Move down
@@ -710,9 +731,11 @@ void minesweeperGame::checkRed(mineSquare& mineIn, int byteValue)
         {
             byteValue += ScreenX * 4;
             curveAmount++;
+            //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+            //Sleep(300);
         }
         byteValue += 4;
-    }while (!isWhite(byteValue + 2 * (ScreenX * 4)));
+    }while (!isWhiteLine(byteValue, mineIn));
    
     if (curveAmount > 1)
         mineIn.setValue('3');
@@ -723,6 +746,8 @@ void minesweeperGame::checkRed(mineSquare& mineIn, int byteValue)
 }
 void minesweeperGame::checkGreen(mineSquare& mineIn, int byteValue)
 {
+    
+
     return;
 }
 void minesweeperGame::findSquareValue(mineSquare& mineIn)
@@ -775,7 +800,9 @@ void minesweeperGame::findSquareValue(mineSquare& mineIn)
     }
     
     if (isRed(byteValue))
+    {
         checkRed(mineIn, byteValue);
+    }
     else if (isBlue(byteValue))
         checkBlue(mineIn, byteValue);
     else 

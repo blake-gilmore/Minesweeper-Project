@@ -67,6 +67,7 @@ private:
     void checkRed(mineSquare&, int);
     void checkGreen(mineSquare&, int);
     void moveTopEdge(mineSquare&, int&);
+    bool isWhiteLine(int byteValue, mineSquare& mineIn);
 
     std::vector<mineSquare*> coordsOfClicks;
 };
