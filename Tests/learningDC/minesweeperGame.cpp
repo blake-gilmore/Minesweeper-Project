@@ -22,6 +22,18 @@ bool isLost()
 {
     return false;
 }
+
+bool minesweeperGame::needToUpdateSurrounding(mineSquare& mineIn)
+{
+    mineSquare* minePtr;
+    for (int i = 0; i < 8; i++)
+    {
+        minePtr = *(mineIn.adjacents[i]);
+        if (minePtr != nullptr && minePtr->getPossibilities() > 0)
+            return true;
+    }
+    return false;
+}
 void minesweeperGame::MakeMove(mineSquare& mineIn)
 {
     mineSquare* minePtr;
@@ -34,51 +46,20 @@ void minesweeperGame::MakeMove(mineSquare& mineIn)
     if (mineIn.getValue() == 'e')
         return;
 
+    if (!mineIn.getClicked())
+        updatePossibilities(mineIn);
     //Check top left to see if new value
     //If new value, call MakeMove(xCoord, yCoord);
-    minePtr = mineIn.getTopLeft();
-    if (minePtr != nullptr && minePtr->getValue() == 'e')
-        MakeMove(*minePtr);
 
-    minePtr = mineIn.getTop();
-    if (minePtr != nullptr && minePtr->getValue() == 'e')
-        MakeMove(*minePtr);
-
-    minePtr = mineIn.getTopRight();
-    if (minePtr != nullptr && minePtr->getValue() == 'e')
-        MakeMove(*minePtr);
-
-    minePtr = mineIn.getLeft();
-    if (minePtr != nullptr && minePtr->getValue() == 'e')
-        MakeMove(*minePtr);
-
-    minePtr = mineIn.getRight();
-    if (minePtr != nullptr && minePtr->getValue() == 'e')
-        MakeMove(*minePtr);
-
-    minePtr = mineIn.getBottomLeft();
-    if (minePtr != nullptr && minePtr->getValue() == 'e')
-        MakeMove(*minePtr);
-
-    minePtr = mineIn.getBottom();
-    if (minePtr != nullptr && minePtr->getValue() == 'e')
-        MakeMove(*minePtr);
-
-    minePtr = mineIn.getBottomRight();
-    if (minePtr != nullptr && minePtr->getValue() == 'e')
-        MakeMove(*minePtr);
-    
-    //No more new squares around
-    if (mineIn.getValue() != 'w')
+    for (int i = 0; i < 8; i++)
     {
-        findPossibilities(mineIn);  
-
-        testCases(mineIn);
+        minePtr = *(mineIn.adjacents[i]);
+        if (minePtr != nullptr && minePtr->getValue() == 'e')
+            MakeMove(*minePtr);
     }
-    return;
-}
-void minesweeperGame::testCases(mineSquare& mineIn)
-{
+    
+    if (mineIn.getValue() != 'w')
+        findPossibilities(mineIn);  
     return;
 }
 void minesweeperGame::flagPossibilities(mineSquare& mineIn)
@@ -88,37 +69,14 @@ void minesweeperGame::flagPossibilities(mineSquare& mineIn)
     //If the square checked is an 'e' square and not NULL
     //flags the square
     mineSquare* minePtr;
-    minePtr = mineIn.getTopLeft();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        flagSquare(*minePtr);
-
-    minePtr = mineIn.getTop();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        flagSquare(*minePtr);
-
-    minePtr = mineIn.getTopRight();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        flagSquare(*minePtr);
-
-    minePtr = mineIn.getLeft();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        flagSquare(*minePtr);
-
-    minePtr = mineIn.getRight();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        flagSquare(*minePtr);
-
-    minePtr = mineIn.getBottomLeft();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        flagSquare(*minePtr);
-
-    minePtr = mineIn.getBottom();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        flagSquare(*minePtr);
-
-    minePtr = mineIn.getBottomRight();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        flagSquare(*minePtr);
+    
+    for (int i = 0; i < 8; i++)
+    {
+        minePtr = *(mineIn.adjacents[i]);
+        if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
+            flagSquare(*minePtr);
+    }
+    return;
 }
 void RightClick()
 {
@@ -135,146 +93,44 @@ void RightClick()
     input[1].mi.time = 0;
 
     UINT usent = SendInput(2, input, sizeof(INPUT));
-    Sleep(300);
+    Sleep(100);
     return;
 }
 void minesweeperGame::updatePossibilities(mineSquare& mineIn)
 {
-    mineSquare* minePtr;/*
-    mineSquare** newMinePtr = mineIn.adjacents;
+    mineSquare* minePtr;
+    
     for (int i = 0; i < 8; i++)
     {
-        minePtr = newMinePtr[i];
+        minePtr = *(mineIn.adjacents[i]);
         if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
         {
             if (minePtr->possibilities > 0)
+            {
                     minePtr->possibilities--;
+                if (minePtr->readyToFlag())
+                    flagPossibilities(*minePtr);
+            }
+
+            //Check flag condition
+            //if (minePtr->readyToFlag())
+            //  flagPossibilities(*minePtr);
         }
-    }*/
-
-
-        minePtr = mineIn.getTopLeft();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
-    }
-
-    minePtr = mineIn.getTop();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
-    }
-
-    minePtr = mineIn.getTopRight();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
-    }
-
-    minePtr = mineIn.getLeft();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
-    }
-
-    minePtr = mineIn.getRight();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
-    }
-
-    minePtr = mineIn.getBottomLeft();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
-    }
-
-    minePtr = mineIn.getBottom();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
-    }
-
-    minePtr = mineIn.getBottomRight();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
     }
     return;
 }
 void minesweeperGame::updateFlags(mineSquare& mineIn)
 {
     mineSquare* minePtr;
-        minePtr = mineIn.getTopLeft();
-    if (minePtr != nullptr && minePtr->getValue() != 'w')
+    for (int i = 0; i < 8; i++)
     {
-        minePtr->flagsNear++;
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
-    }
-
-    minePtr = mineIn.getTop();
-    if (minePtr != nullptr && minePtr->getValue() != 'w')
-    {
-        minePtr->flagsNear++;
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
-    }
-
-    minePtr = mineIn.getTopRight();
-    if (minePtr != nullptr && minePtr->getValue() != 'w')
-    {
-        minePtr->flagsNear++;
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
-    }
-
-    minePtr = mineIn.getLeft();
-    if (minePtr != nullptr && minePtr->getValue() != 'w')
-    {
-        minePtr->flagsNear++;
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
-    }
-
-    minePtr = mineIn.getRight();
-    if (minePtr != nullptr && minePtr->getValue() != 'w')
-    {
-        minePtr->flagsNear++;
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
-    }
-
-    minePtr = mineIn.getBottomLeft();
-    if (minePtr != nullptr && minePtr->getValue() != 'w')
-    {
-        minePtr->flagsNear++;
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
-    }
-
-    minePtr = mineIn.getBottom();
-    if (minePtr != nullptr && minePtr->getValue() != 'w')
-    {
-        minePtr->flagsNear++;
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
-    }
-
-    minePtr = mineIn.getBottomRight();
-    if (minePtr != nullptr && minePtr->getValue() != 'w')
-    {
-        minePtr->flagsNear++;
-        if (minePtr->possibilities > 0)
-                minePtr->possibilities--;
+        minePtr = *(mineIn.adjacents[i]);
+        if (minePtr != nullptr && minePtr->getValue() != 'w')
+        {
+            minePtr->flagsNear++;
+            if (minePtr->possibilities > 0)
+                    minePtr->possibilities--;
+        }
     }
     return;
 }
@@ -300,108 +156,22 @@ void minesweeperGame::flagSquare(mineSquare& mineIn)
     updateFlags(mineIn);
     //Update possibilities of all surrounnding mines
 
-    minePtr = mineIn.getTopLeft();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
+    
+    for (int i = 0; i < 8; i++)
     {
-        if (minePtr->possibilities > 0)
+        minePtr = *(mineIn.adjacents[i]);
+        if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
         {
-            if (minePtr->flagsNear == minePtr->getValue() - '0' && minePtr->possibilities > 0)
-                clickEmpties(*minePtr);
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear)) && minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
+            if (minePtr->possibilities > 0)
+            {
+                if (minePtr->flagsNear == minePtr->getValue() - '0' && minePtr->possibilities > 0)
+                    clickEmpties(*minePtr);
+                if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear)) && minePtr->possibilities > 0)
+                    flagPossibilities(*minePtr);
+            }
         }
     }
-
-    minePtr = mineIn.getTop();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        if (minePtr->possibilities > 0)
-        {
-            if (minePtr->flagsNear == minePtr->getValue() - '0' && minePtr->possibilities > 0)
-                clickEmpties(*minePtr);
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear)) && minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
-        }
-
-    }
-
-    minePtr = mineIn.getTopRight();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        if (minePtr->possibilities > 0)
-        {
-            if (minePtr->flagsNear == minePtr->getValue() - '0' && minePtr->possibilities > 0)
-                clickEmpties(*minePtr);
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear)) && minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
-        }
-
-    }
-
-    minePtr = mineIn.getLeft();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        if (minePtr->possibilities > 0)
-        {
-            if (minePtr->flagsNear == minePtr->getValue() - '0' && minePtr->possibilities > 0)
-                clickEmpties(*minePtr);
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear)) && minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
-        }
-
-    }
-
-    minePtr = mineIn.getRight();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        if (minePtr->possibilities > 0)
-        {
-            if (minePtr->flagsNear == minePtr->getValue() - '0' && minePtr->possibilities > 0)
-                clickEmpties(*minePtr);
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear)) && minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
-        }
-
-    }
-
-    minePtr = mineIn.getBottomLeft();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        if (minePtr->possibilities > 0)
-        {
-            if (minePtr->flagsNear == minePtr->getValue() - '0' && minePtr->possibilities > 0)
-                clickEmpties(*minePtr);
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear)) && minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
-        }
-
-    }
-
-    minePtr = mineIn.getBottom();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        if (minePtr->possibilities > 0)
-        {
-            if (minePtr->flagsNear == minePtr->getValue() - '0' && minePtr->possibilities > 0)
-                clickEmpties(*minePtr);
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear)) && minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
-        }
-
-    }
-
-    minePtr = mineIn.getBottomRight();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        if (minePtr->possibilities > 0)
-        {
-            if (minePtr->flagsNear == minePtr->getValue() - '0' && minePtr->possibilities > 0)
-                clickEmpties(*minePtr);
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear)) && minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
-        }
-
-    }
+    return;
 }
 void minesweeperGame::findPossibilities(mineSquare& mineIn)
 {
@@ -411,36 +181,14 @@ void minesweeperGame::findPossibilities(mineSquare& mineIn)
         return;
     
     mineSquare* minePtr;
-    minePtr = mineIn.getTopLeft();
-     if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        mineIn.possibilities++;
 
-    minePtr = mineIn.getTop();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        mineIn.possibilities++;
-    minePtr = mineIn.getTopRight();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        mineIn.possibilities++;
-
-    minePtr = mineIn.getLeft();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        mineIn.possibilities++;
-
-    minePtr = mineIn.getRight();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        mineIn.possibilities++;
-
-    minePtr = mineIn.getBottomLeft();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        mineIn.possibilities++;
-
-    minePtr = mineIn.getBottom();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        mineIn.possibilities++;
-
-    minePtr = mineIn.getBottomRight();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        mineIn.possibilities++;
+    
+    for (int i = 0; i < 8; i++)
+    {
+        minePtr = *(mineIn.adjacents[i]);
+        if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
+            mineIn.possibilities++;
+    }
 
     if ((mineIn.getPossibilities() + mineIn.flagsNear) == (mineIn.getValue() - '0'))
             flagPossibilities(mineIn);  
@@ -458,37 +206,13 @@ void minesweeperGame::clickEmpties(mineSquare& mineIn)
 {
     //Checks each surrounding square of mineIn, if not already clicked and value is 'e', click that square
     mineSquare* minePtr;
-    minePtr = mineIn.getTopLeft();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        clickSquare(*minePtr);
-
-    minePtr = mineIn.getTop();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        clickSquare(*minePtr);
-
-    minePtr = mineIn.getTopRight();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        clickSquare(*minePtr);
-
-    minePtr = mineIn.getLeft();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        clickSquare(*minePtr);
-
-    minePtr = mineIn.getRight();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        clickSquare(*minePtr);
-
-    minePtr = mineIn.getBottomLeft();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        clickSquare(*minePtr);
-
-    minePtr = mineIn.getBottom();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        clickSquare(*minePtr);
-
-    minePtr = mineIn.getBottomRight();
-    if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
-        clickSquare(*minePtr);
+    
+    for (int i = 0; i < 8; i++)
+    {
+        minePtr = *(mineIn.adjacents[i]);
+        if (minePtr != nullptr && minePtr->getValue() == 'e' && minePtr->getClicked() == false)
+            clickSquare(*minePtr);
+    }
     return;
 }
 void LeftClick()
@@ -505,7 +229,7 @@ void LeftClick()
     input[1].mi.time = 0;
 
     UINT usent = SendInput(2, input, sizeof(INPUT));
-    Sleep(300);
+    Sleep(100);
     return;
 
 }
@@ -523,100 +247,23 @@ void minesweeperGame::clickSquare(mineSquare& mineIn)
     coordsOfClicks.push_back(&mineIn);
     updatePossibilities(mineIn);
     //Update possibilities of all surrounding mines
-    minePtr = mineIn.getTopLeft();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
+
+
+    for (int i = 0; i < 8; i++)
     {
-        //minePtr->flagsNear++;
-        if (minePtr->possibilities > 0)
+        minePtr = *(mineIn.adjacents[i]);
+        if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
         {
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear))&& minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
-        }
+            //minePtr->flagsNear++;
+            if (minePtr->possibilities > 0)
+            {
+                if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear))&& minePtr->possibilities > 0)
+                    flagPossibilities(*minePtr);
+            }
 
-    }
-
-    minePtr = mineIn.getTop();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-       // minePtr->flagsNear++;
-       if (minePtr->possibilities > 0)
-       {
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear))&& minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
-        }
-
-    }
-
-    minePtr = mineIn.getTopRight();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        //minePtr->flagsNear++;
-        if (minePtr->possibilities > 0)
-        {
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear))&& minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
-        }
-
-    }
-
-    minePtr = mineIn.getLeft();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        //minePtr->flagsNear++;
-        if (minePtr->possibilities > 0)
-        {
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear))&& minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
-        }
-
-    }
-
-    minePtr = mineIn.getRight();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-       // minePtr->flagsNear++;
-       if (minePtr->possibilities > 0)
-       {
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear))&& minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
-        }
-
-    }
-
-    minePtr = mineIn.getBottomLeft();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        //minePtr->flagsNear++;
-        if (minePtr->possibilities > 0)
-        {
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear))&& minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
-        }
-
-    }
-
-    minePtr = mineIn.getBottom();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-       // minePtr->flagsNear++;
-       if (minePtr->possibilities > 0)
-       {
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear))&& minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
-        }
-
-    }
-
-    minePtr = mineIn.getBottomRight();
-    if (minePtr != nullptr && minePtr->getValue() != 'e' && minePtr->getValue() != 'w')
-    {
-        //minePtr->flagsNear++;
-        if (minePtr->possibilities > 0)
-        {
-            if (minePtr->possibilities == ((minePtr->getValue() - '0') - (minePtr->flagsNear))&& minePtr->possibilities > 0)
-                flagPossibilities(*minePtr);
         }
     }
+    return;
 }
 
 char minesweeperGame::getColor(int byteValue)
@@ -661,17 +308,17 @@ void minesweeperGame::checkBlue(mineSquare& mineIn, int byteValue)
     moveToRightEdge(mineIn, byteValue);
     while (isWhite(byteValue - 4))
     {
-       // SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+        //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
         //Sleep(50);
         byteValue -= 4;
     }
     while (isWhite(byteValue) && !isWhite(byteValue - 4))
     {
         //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-       // Sleep(50);
+       //Sleep(50);
         byteValue += (ScreenX * 4);
     }
-    if (isWhite(byteValue))
+    if (isWhite(byteValue) || isWhite(byteValue + (ScreenX * 4)))
         mineIn.setValue('1');
     else
         mineIn.setValue('4');
@@ -696,6 +343,24 @@ void minesweeperGame::moveTopEdge(mineSquare& mineIn, int& byteValue)
     }while (bitPointer[byteValue] < 100);
     return;
 }
+void minesweeperGame::moveBottomEdge(mineSquare& mineIn, int& byteValue)
+{
+    byteValue = getXYByte(mineIn.getXCoord(), mineIn.getYCoord());
+    //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+   //Sleep(300);
+    byteValue += bytesToPixelsX(bytesBetweenSquares / 2) * ScreenX * 4;
+   //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+    //Sleep(2000);
+    while (byteValue % 4 != 0)
+        byteValue--;
+    do
+    {
+        byteValue-=ScreenX * 4;
+        //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+        //Sleep(50);
+    }while (bitPointer[byteValue] < 100);
+    return;
+}
 bool minesweeperGame::isWhiteLine(int byteValue, mineSquare& mineIn)
 {
     bool whiteLine(true);
@@ -713,6 +378,23 @@ bool minesweeperGame::isWhiteLine(int byteValue, mineSquare& mineIn)
 
     return whiteLine;
 }
+bool minesweeperGame::isWhiteLineAbove(int byteValue, mineSquare& mineIn)
+{
+    bool whiteLine(true);
+    do
+    {
+        byteValue -= (ScreenX * 4);
+        //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+       // Sleep(300);
+        if (!isWhite(byteValue))
+        {
+            whiteLine = false;
+            break;
+        }
+    }while (bytesToPixelsY(byteValue) > mineIn.getYCoord());
+
+    return whiteLine;
+}
 void minesweeperGame::checkRed(mineSquare& mineIn, int byteValue)
 {
     moveTopEdge(mineIn, byteValue);
@@ -727,6 +409,11 @@ void minesweeperGame::checkRed(mineSquare& mineIn, int byteValue)
     //Move down
     do
     {
+        if (!isWhite(byteValue))
+        {
+            byteValue -= ScreenX * 4;
+            curveAmount++;
+        }
         if (isWhite(byteValue + (ScreenX * 4)))
         {
             byteValue += ScreenX * 4;
@@ -737,7 +424,7 @@ void minesweeperGame::checkRed(mineSquare& mineIn, int byteValue)
         byteValue += 4;
     }while (!isWhiteLine(byteValue, mineIn));
    
-    if (curveAmount > 1)
+    if (curveAmount >= 1)
         mineIn.setValue('3');
     else
         mineIn.setValue('5');
@@ -746,8 +433,32 @@ void minesweeperGame::checkRed(mineSquare& mineIn, int byteValue)
 }
 void minesweeperGame::checkGreen(mineSquare& mineIn, int byteValue)
 {
-    
+    moveBottomEdge(mineIn, byteValue);
+    do
+    {
+        byteValue -= (ScreenX * 4);
+        //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+        //Sleep(300);
+    }while (isWhite(byteValue - (ScreenX * 4)));
 
+    int curveAmount(0);
+    //Move up
+    do
+    {
+        if (isWhite(byteValue - (ScreenX * 4)))
+        {
+            byteValue -= ScreenX * 4;
+            curveAmount++;
+            //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+            //Sleep(300);
+        }
+        byteValue += 4;
+    }while (!isWhiteLineAbove(byteValue, mineIn));
+   
+    if (curveAmount > 1)
+        mineIn.setValue('6');
+    else
+        mineIn.setValue('2');
     return;
 }
 void minesweeperGame::findSquareValue(mineSquare& mineIn)
@@ -757,28 +468,12 @@ void minesweeperGame::findSquareValue(mineSquare& mineIn)
     if (mineIn.getValue() != 'e')
         return;
 
-    //Check for any white on one line
-
-
-    //Calculate byte value of pixels
-    //1: R 25, G 188, B 223
-    //2: 117, 151, 32
-    //3: 228, 74, 134
-
-    //To Check for white, rgb over 200
-
-    //For one, go to rightmost side, and trace down
-    //For 2, follow straightness of bottom 
-
-    //For 3, 
-    //Other Way
-
     int byteValue = getXYByte(mineIn.getXCoord(), mineIn.getYCoord());
     
     //Move pixel to 5/6th of the way into the square
     byteValue += (bytesBetweenSquares / 3);
-    SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-    Sleep(50);
+    //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+    //Sleep(50);
     while (byteValue % 4 != 0)
         byteValue--;
 
@@ -788,8 +483,8 @@ void minesweeperGame::findSquareValue(mineSquare& mineIn)
     while(true)
     {
         byteValue -= 4;
-        SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-        Sleep(50);
+        //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
+        //Sleep(50);
         if (!isWhite(byteValue))
             break;
         if (bytesToPixelsX(byteValue) < mineIn.getXCoord())
@@ -800,143 +495,11 @@ void minesweeperGame::findSquareValue(mineSquare& mineIn)
     }
     
     if (isRed(byteValue))
-    {
         checkRed(mineIn, byteValue);
-    }
     else if (isBlue(byteValue))
         checkBlue(mineIn, byteValue);
     else 
         checkGreen(mineIn, byteValue);
-    return;
-
-
-    //Start at top right corner of square
-    //Get right, get top
-    //int byteValue = getXYByte(mineIn.getXCoord(), mineIn.getYCoord());
-    byteValue += (bytesBetweenSquares / 2);
-    //std::cout << bytesBetweenSquares << std::endl;
-    while (byteValue % 4 != 0)
-        byteValue--;
-    
-    SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-    //Sleep(10);
-    do
-    {
-        byteValue-=4;
-        SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-    //Sleep(10);
-    }while (bitPointer[byteValue] < 100);
-    if (!isWhite(byteValue-8))
-        return;
-
-    do
-    {
-        byteValue -= (ScreenX * 4);
-        SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-    //Sleep(10);
-    } while (bitPointer[byteValue] > 100);
-    int topSquare = bytesToPixelsY(byteValue);
-    //Have top right, now go diagonally down left while white
-
-    //Move until isWhite
-    do
-    {
-        byteValue -= 8;
-        byteValue += (ScreenX * 4);
-        SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-    //Sleep(10);
-    }while (!isWhite(byteValue));
-
-    while(isWhite((byteValue - 4) + ScreenX*4))
-    {
-        byteValue -= 4;
-        byteValue += (ScreenX * 4);
-        if (bytesToPixelsX(byteValue) < mineIn.getXCoord())
-        {
-            mineIn.setValue('w');
-            return;
-        }
-        //SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-    //Sleep(10);
-    }
-    
-    if (bytesToPixelsX(byteValue) < mineIn.getXCoord())
-    {
-        mineIn.setValue('w');
-        return;
-    }
-
-    char color = getColor((byteValue - 4) + ScreenX*4);
-    if (color == 'b')
-        checkBlue(mineIn, byteValue);
-    else if (color == 'g')
-        checkGreen(mineIn, byteValue);
-    else
-        checkRed(mineIn, byteValue);
-
-    return;
-
-    bool isCurved(false);
-    int postX(0);
-    if (!isWhite(byteValue + (ScreenX * 4)))
-    {
-        while (!isWhite(byteValue + (ScreenX * 4)))
-        {
-            do
-            {
-                byteValue += 4;
-                postX++;
-            }while (!isWhite(byteValue + (ScreenX * 4)));
-            byteValue += (ScreenX * 4);
-            SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-
-            /*if (isWhite(byteValue + 4 + (ScreenX * 4)))
-            {
-                byteValue += 4 + (ScreenX * 4);
-                SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-Sleep(10);
-            }
-            else if (isWhite(byteValue + 8 + (ScreenX * 4)))
-            {
-                byteValue += 8 + (ScreenX * 4);
-                //postX+= 2;
-                SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-Sleep(10);
-            }*/
-        }
-    }
-    if (postX > 1)
-        isCurved = true;
-    moveDownNumber(byteValue, isCurved);
-
-    //Check for number 1
-    //isXChanged is no, is Curved is no
-    //Next y value down should be white, otherwise it's a 4
-    if (isCurved == false)
-    {
-        if (isWhite(byteValue + (ScreenX * 4)))
-        {
-            mineIn.setValue('1');
-        }
-        else
-            mineIn.setValue('4');
-        return;
-    }
-
-    //Check for 2 and 3
-    //If 2, then byteValue should be below half of the square should be greater than top plus bytesBetweenSquares * ScreenX * 4
-    //Otherwise, it's a 3
-    //if (isWhite(byteValue + 12 + (ScreenX * 4) * 3))
-
-    //std::cout << bytesToPixelsY(byteValue) << std::endl;
-    //std::cout << topSquare << std::endl;
-    //std::cout << squareHeight / 2;
-    if ((!isWhite(byteValue + (ScreenX * 4))) &&  !isRed(byteValue + (ScreenX * 4)))
-    {
-        mineIn.setValue('2');
-    }
-    else
-        mineIn.setValue('3');
     return;
 }
 bool minesweeperGame::isRed(int byteValue)
@@ -948,89 +511,6 @@ bool minesweeperGame::isBlue(int byteValue)
     return (bitPointer[byteValue] > bitPointer[byteValue+1]);
 }
 
-void minesweeperGame::moveDownNumber(int& byteValue, bool& isCurved)
-{
-    int initX = bytesToPixelsX(byteValue);
-    int postX = 0;
-    bool negativeChange(false);
-
-    //Move down by Y
-    //If white, try moving left 2 pixels to find a non-white value
-    //  If not possible, then this is a 1 value, return
-    //  If possible, then make negativeChange = true
-    //  check if postX differs by 2 or more pixels, if it does, change isCurved to true
-    //and loop again
-    //If nonwhite, try moving right 2 pixels to find white value
-    //  if possible, check if negativeChange == true
-    //      if false, then move and loop
-    //      if true, then return
-    //  if not possible, return
-    do
-    {
-        //byteValue += (ScreenX * 4);
-        if (isWhite(byteValue + (ScreenX * 4)))
-        {
-            byteValue += ScreenX * 4;
-            SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-    //Sleep(10);
-            if (isWhite(byteValue - 12))
-                return;
-            else if (isWhite(byteValue - 8))
-            {
-                byteValue -= 8;
-                postX -= 2;
-                SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-    //Sleep(10);
-            }
-            else if (isWhite(byteValue - 4))
-            {
-                byteValue -= 4;
-                postX--;
-                SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-    //Sleep(10);
-            }
-            if (postX < -1)
-            {
-                isCurved = true;
-                negativeChange = true;
-            }
-        }
-        else
-        {
-            if (isBlue(byteValue -8))
-                return;
-            if (negativeChange == true)
-            {
-                return;
-            }
-            else
-            {
-                if (!isWhite(byteValue + 12 + (ScreenX * 4)))
-                {
-                    return;
-                }
-                if (isWhite(byteValue + 4 + (ScreenX * 4)))
-                {
-                    byteValue += 4 + (ScreenX * 4);
-                    //postX++;
-                    SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-    //Sleep(10);
-                }
-                else if (isWhite(byteValue + 8 + (ScreenX * 4)))
-                {
-                    byteValue += 8 + (ScreenX * 4);
-                    //postX+= 2;
-                    SetCursorPos(bytesToPixelsX(byteValue), bytesToPixelsY(byteValue));
-    //Sleep(10);
-                }
-                //if (postX > )
-                   // isCurved = true;
-            }
-        }
-
-    } while (true);
-    return;
-}
 
 void minesweeperGame::SearchFor(int inR, int inG, int inB)
 {
@@ -1095,27 +575,19 @@ void minesweeperGame::initMap()
     int BottomOfFirstSquare = topOfFirstSquare;
     do
     {
-        //SetCursorPos(bytesToPixelsX(BottomOfFirstSquare), bytesToPixelsY(BottomOfFirstSquare));
-               // Sleep(50);
+        
         BottomOfFirstSquare += (ScreenX * 4);
     } while (bitPointer[BottomOfFirstSquare] >= 100); 
-                /*SetCursorPos(bytesToPixelsX(topOfFirstSquare), bytesToPixelsY(topOfFirstSquare));
-                Sleep(2000);
-                SetCursorPos(bytesToPixelsX(BottomOfFirstSquare), bytesToPixelsY(BottomOfFirstSquare));
-                Sleep(2000);*/
+                
     int middleOfFirstSquare = topOfFirstSquare + pixelsToBytesY(((bytesToPixelsY(BottomOfFirstSquare) - bytesToPixelsY(topOfFirstSquare)) / 2));
-    //SetCursorPos(bytesToPixelsX(middleOfFirstSquare), bytesToPixelsY(middleOfFirstSquare));
-                //Sleep(2000);
+    
     while ((middleOfFirstSquare % 4) != 0)
         middleOfFirstSquare--;
 
     //Find Left of first Square
     int mark = middleOfFirstSquare;
-    
     do
     {
-        //SetCursorPos(bytesToPixelsX(mark), bytesToPixelsY(mark));
-                //Sleep(50);
         mark -= 4;
     } while (bitPointer[mark] >= 100);
     int leftOfFirstSquare = mark;
@@ -1124,26 +596,19 @@ void minesweeperGame::initMap()
     int startOfGap = mark;
     do
     {
-        //SetCursorPos(bytesToPixelsX(mark), bytesToPixelsY(mark));
-                //Sleep(50);
         mark -= 4;
-
     } while (bitPointer[mark] <= 100);
     mark += 4;
     int bytesOfGaps = startOfGap - mark;
 
     
     mark = leftOfFirstSquare;
-    
     //Find Right of First Square
     do
     {
-       // SetCursorPos(bytesToPixelsX(mark), bytesToPixelsY(mark));
-                //Sleep(50);
         mark += 4;
     }while(bitPointer[mark] >= 100);
     int rightOfFirstSquare = mark;
-    
 
     //Refind top of square
     mark =leftOfFirstSquare + ((rightOfFirstSquare - leftOfFirstSquare)/2);
@@ -1151,13 +616,10 @@ void minesweeperGame::initMap()
         mark--;
     do
     {
-       // Sleep(50);
-        //SetCursorPos(bytesToPixelsX(mark), bytesToPixelsY(mark));
         mark -= (ScreenX * 4);
     }while(bitPointer[mark] >= 100);
     topOfFirstSquare = mark;
     
-
     //Refind bottom of first square
     do
     {

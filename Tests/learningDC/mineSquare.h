@@ -36,7 +36,8 @@ public:
     int flagsNear;
     int column;
     int row;
-    mineSquare** adjacents;
+    mineSquare*** adjacents;
+    bool readyToFlag();
 private:
     int xCoord;
     int yCoord;

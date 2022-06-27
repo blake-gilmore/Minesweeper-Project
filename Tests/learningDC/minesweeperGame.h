@@ -59,15 +59,17 @@ private:
     int getXYByte(int x, int y);
     bool isWhite(int);
     bool isBlue(int);
-    void moveDownNumber(int&, bool&);
     void clickEmpties(mineSquare&);
     void clickSquare(mineSquare&);
     char getColor(int);
     void checkBlue(mineSquare&, int);
     void checkRed(mineSquare&, int);
     void checkGreen(mineSquare&, int);
+    void moveBottomEdge(mineSquare&, int&);
     void moveTopEdge(mineSquare&, int&);
+    bool isWhiteLineAbove(int byteValue, mineSquare& mineIn);
     bool isWhiteLine(int byteValue, mineSquare& mineIn);
+    bool needToUpdateSurrounding(mineSquare&);
 
     std::vector<mineSquare*> coordsOfClicks;
 };
