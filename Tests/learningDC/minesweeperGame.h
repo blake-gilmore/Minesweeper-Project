@@ -33,7 +33,7 @@ public:
     void clearClicks();
     void moveToRightEdge(mineSquare&, int&);
     void simulate(mineSquare&);
-    mineSquare* findAdjacentSquare(mineSquare**, int);
+    bool findAdjacentSquare(mineSquare**, int);
 private:
     //LPCWSTR windowName = L"Microsoft Minesweeper";
     int numMines;

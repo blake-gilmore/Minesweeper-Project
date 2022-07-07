@@ -951,7 +951,7 @@ int minesweeperGame::getXYByte(int x, int y)
     return (pixelsToBytesX(x) + pixelsToBytesY(y));
 }
 
-mineSquare* minesweeperGame::findAdjacentSquare(mineSquare** minePtr, int sizeOfArray)
+bool minesweeperGame::findAdjacentSquare(mineSquare** minePtr, int sizeOfArray)
 {
 //Precondition: minePtr is an initialized array of mineSquare pointers
 //sizeOfArray is the number of mineSquare pointers within minePtr
@@ -987,19 +987,18 @@ mineSquare* minesweeperGame::findAdjacentSquare(mineSquare** minePtr, int sizeOf
         }
     }
     if (allAdjacents.empty())
-        return;
+        return false;
 
     for (int i = 0; i < allAdjacents.size(); i++)
     {
-        
+        if (allAdjacents[i]->flagsNear + sizeOfArray > (allAdjacents[i]->getValue() - '0'))
+            return true;
     }
+    return false;
 
     /*std::cout << "Mine number " << i << ":\n";
     std::cout << "Row: " << minePtr[i]->row << std::endl << "Column: " << minePtr[i]->column << std::endl;
     std::cout << std::endl << std::endl;*/
-
-
-    return minePtr[0];
 }
 
 void minesweeperGame::simulate(mineSquare& mineIn)
@@ -1035,7 +1034,10 @@ void minesweeperGame::simulate(mineSquare& mineIn)
                         break;
                 }
             }
-            mineSquare* adjSquare = findAdjacentSquare(minePtr, count);
+            if(findAdjacentSquare(minePtr, count))
+            {
+                flagSquare(*flagSimulate);
+            }
             delete[] minePtr;
         }
     }
