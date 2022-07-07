@@ -950,10 +950,116 @@ int minesweeperGame::getXYByte(int x, int y)
 {
     return (pixelsToBytesX(x) + pixelsToBytesY(y));
 }
+
+mineSquare* minesweeperGame::findAdjacentSquare(mineSquare** minePtr, int sizeOfArray)
+{
+//Precondition: minePtr is an initialized array of mineSquare pointers
+//sizeOfArray is the number of mineSquare pointers within minePtr
+//Postcondition:
+//Determines if every mineSquare within the minePtr array shares at least one adjacent mine. If not, returns nullptr, otherwise 
+//checks if that adjacent mine would be paradoxical if sizeOfArray flags was added to its flag count
+//If not, loops to find another adjacent square
+//If so, returns a pointer to that mine
+//If none were found within the loop, then return nullptr
+    std::vector<mineSquare*> allAdjacents;
+    bool sharedAdjacentExists;
+    mineSquare** currentSquare;
+    //Loop through adjacent squares of first member of array
+    for (int i = 0; i < 8; i++)
+    {
+        //Checks all mines in the minePtr array for matching adjacent
+        currentSquare = minePtr[0]->adjacents[i];
+        if (currentSquare != nullptr)
+        {
+            for (int j = 1; j < sizeOfArray; j++)
+            {
+                sharedAdjacentExists = false;
+                for (int k = 0; k < 8; k++)
+                {
+                    if (minePtr[j]->adjacents[k] == currentSquare)
+                        sharedAdjacentExists = true;
+                }
+                if (!sharedAdjacentExists)
+                    break;
+    
+                allAdjacents.push_back(*currentSquare);
+            }
+        }
+    }
+    if (allAdjacents.empty())
+        return;
+
+    for (int i = 0; i < allAdjacents.size(); i++)
+    {
+        
+    }
+
+    /*std::cout << "Mine number " << i << ":\n";
+    std::cout << "Row: " << minePtr[i]->row << std::endl << "Column: " << minePtr[i]->column << std::endl;
+    std::cout << std::endl << std::endl;*/
+
+
+    return minePtr[0];
+}
+
+void minesweeperGame::simulate(mineSquare& mineIn)
+{
+//Precondition: Pass in an initialized mineSquare value
+//Postcondition: For each adjacent square of mineIn, simulates a "what-if" scenario for if a flag were to exist at that square.
+//Checks: if a flag exists at an adjacent square, does that force a paradoxical state in the game. If so, then a flag 
+//cannot exist at that square, and thus clicks the square
+
+    mineSquare* flagSimulate;
+    mineSquare* testAdjacent;
+    for (int i = 0; i < 8; i++)
+    {
+        //Selects one adjacent square to "flag" in the 'what-if' scenario
+        //this square must not be null, and must be empty
+        flagSimulate = *(mineIn.adjacents[i]);
+        if (flagSimulate != nullptr && (flagSimulate->getValue() == 'e'))
+        {
+            mineSquare** minePtr = new mineSquare*[mineIn.possibilities - 1];
+            int count(0);
+            for (int j = 0; j < 8; j++)
+            {
+
+                if (j != i)
+                {
+                    testAdjacent = *(mineIn.adjacents[j]);
+                    if (testAdjacent->getValue() == 'e')
+                    {
+                        minePtr[count] = testAdjacent;
+                        count++;
+                    }
+                    if (count == mineIn.possibilities - 1)
+                        break;
+                }
+            }
+            mineSquare* adjSquare = findAdjacentSquare(minePtr, count);
+            delete[] minePtr;
+        }
+    }
+    return;
+}
+
 void minesweeperGame::clearClicks()
 {
-    if (coordsOfClicks.size() == 0)
-        exit;
+    if (coordsOfClicks.empty())
+    {
+        for (int i = 0; i < gameRows; i++)
+        {
+            for (int j = 0; j < gameColumns; j++)
+            {
+                mineSquare tempMine = mapSquares[i][j];
+                if (tempMine.possibilities > 0)
+                {
+                    if ((tempMine.possibilities - (tempMine.getValue() - '0')) == 1)
+                        simulate(tempMine);
+                }
+            }
+        }
+    }
+
     for (int i = (coordsOfClicks.size() - 1); i >= 0; i--)
     {
         MakeMove(*coordsOfClicks[i]);
