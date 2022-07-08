@@ -969,14 +969,14 @@ bool minesweeperGame::findAdjacentSquare(mineSquare** minePtr, int sizeOfArray)
     {
         //Checks all mines in the minePtr array for matching adjacent
         currentSquare = minePtr[0]->adjacents[i];
-        if (currentSquare != nullptr)
+        if (currentSquare != nullptr && (**currentSquare).getValue() != 'w' && (**currentSquare).getValue() != 'e')
         {
             for (int j = 1; j < sizeOfArray; j++)
             {
                 sharedAdjacentExists = false;
                 for (int k = 0; k < 8; k++)
                 {
-                    if (minePtr[j]->adjacents[k] == currentSquare)
+                    if (*minePtr[j]->adjacents[k] == *currentSquare)
                         sharedAdjacentExists = true;
                 }
                 if (!sharedAdjacentExists)
@@ -1061,11 +1061,12 @@ void minesweeperGame::clearClicks()
             }
         }
     }
-
-    for (int i = (coordsOfClicks.size() - 1); i >= 0; i--)
+    else
     {
-        MakeMove(*coordsOfClicks[i]);
-        coordsOfClicks.erase(coordsOfClicks.begin() + i);
+        for (int i = (coordsOfClicks.size() - 1); i >= 0; i--)
+        {
+            MakeMove(*coordsOfClicks[i]);
+            coordsOfClicks.erase(coordsOfClicks.begin() + i);
+        }
     }
-    
 }
