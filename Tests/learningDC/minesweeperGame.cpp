@@ -964,11 +964,15 @@ bool minesweeperGame::findAdjacentSquare(mineSquare** minePtr, int sizeOfArray)
     std::vector<mineSquare*> allAdjacents;
     bool sharedAdjacentExists;
     mineSquare** currentSquare;
+    if (sizeOfArray == 0)
+        return false;
     //Loop through adjacent squares of first member of array
     for (int i = 0; i < 8; i++)
     {
         //Checks all mines in the minePtr array for matching adjacent
         currentSquare = minePtr[0]->adjacents[i];
+        if (*currentSquare == nullptr)
+            continue;
         if (currentSquare != nullptr && (**currentSquare).getValue() != 'w' && (**currentSquare).getValue() != 'e')
         {
             for (int j = 1; j < sizeOfArray; j++)
@@ -1015,7 +1019,9 @@ void minesweeperGame::simulate(mineSquare& mineIn)
         //Selects one adjacent square to "flag" in the 'what-if' scenario
         //this square must not be null, and must be empty
         flagSimulate = *(mineIn.adjacents[i]);
-        if (flagSimulate != nullptr && (flagSimulate->getValue() == 'e'))
+        if (flagSimulate == nullptr)
+            continue;
+        if (flagSimulate->getValue() == 'e')
         {
             mineSquare** minePtr = new mineSquare*[mineIn.possibilities - 1];
             int count(0);
@@ -1025,6 +1031,8 @@ void minesweeperGame::simulate(mineSquare& mineIn)
                 if (j != i)
                 {
                     testAdjacent = *(mineIn.adjacents[j]);
+                    if (testAdjacent == nullptr)
+                        continue;
                     if (testAdjacent->getValue() == 'e')
                     {
                         minePtr[count] = testAdjacent;
@@ -1041,6 +1049,21 @@ void minesweeperGame::simulate(mineSquare& mineIn)
             delete[] minePtr;
         }
     }
+    /*if (coordsOfClicks.size() == 0)
+    {
+        //Simulate if adjacents contain value - flagsNear flags if fulfills adjacent value
+        //Collect all adjacents of the square that are empty
+        int emptyCount(0);
+        for (int i = 0; i < 8; i++)
+        {
+            if ((*(mineIn.adjacents[i]))->getValue() == 'e')
+            {
+                
+            }
+        }
+
+    }*/
+    
     return;
 }
 
@@ -1055,18 +1078,24 @@ void minesweeperGame::clearClicks()
                 mineSquare tempMine = mapSquares[i][j];
                 if (tempMine.possibilities > 0)
                 {
-                    if ((tempMine.possibilities - (tempMine.getValue() - '0')) == 1)
+                    if ((tempMine.possibilities - (tempMine.getValue() - '0' - tempMine.flagsNear)) == 1)
+                    {
                         simulate(tempMine);
+                        SetCursorPos(0,0);
+                        Sleep(50);
+                        MapGame();
+                        Sleep(50);
+                    }
+                    //else if ()
                 }
             }
         }
     }
-    else
+
+    for (int i = (coordsOfClicks.size() - 1); i >= 0; i--)
     {
-        for (int i = (coordsOfClicks.size() - 1); i >= 0; i--)
-        {
-            MakeMove(*coordsOfClicks[i]);
-            coordsOfClicks.erase(coordsOfClicks.begin() + i);
-        }
+        MakeMove(*coordsOfClicks[i]);
+        coordsOfClicks.erase(coordsOfClicks.begin() + i);
     }
+
 }

@@ -101,7 +101,7 @@ int main()
                 {
                     //Clear clicks made from last set of moves
                     
-                    do 
+                    /*do 
                     {
                         std::cout << "y/n to check values";
                         std::cin >> input;
@@ -118,29 +118,13 @@ int main()
                             game.mapSquares[tempNum][tempNum2].printSquare();
                         }
                     }
-                    while(input == 'y');
+                    while(input == 'y');*/
                     SetCursorPos(0,0);
                     Sleep(50);
                     game.MapGame();
+                    Sleep(50);
                     game.clearClicks();
-                    do 
-                    {
-                        std::cout << "y/n to check values";
-                        std::cin >> input;
-                        if (input == 'y')
-                        {
-                            std::cout << "Enter row: ";
-                            std::cin >> tempNum;
-                            std::cout << "Enter column: ";
-                            std::cin >> tempNum2;
-                            //Sleep(3000);
-                            game.findSquareValue(game.mapSquares[tempNum][tempNum2]);
-                            std::cout << "Value in square is: ";
-                            std::cout << game.mapSquares[tempNum][tempNum2].getValue() << std::endl;
-                            game.mapSquares[tempNum][tempNum2].printSquare();
-                        }
-                    }
-                    while(input == 'y');
+                
 
                 } while (game.getNumMines() > 0);
             }
