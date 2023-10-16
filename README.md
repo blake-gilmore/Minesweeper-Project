@@ -6,6 +6,10 @@ Works only with Microsoft Minesweeper at full screen. Use g++ *.cpp -l gdi32 -o 
 Once running, and you have a Microsoft Minesweeper window at full screen, press 3 on the numpad to start the bot. Return to the program and pres control + C to close. 
 
 
+https://github.com/blake-gilmore/Minesweeper-Project/assets/80655017/050fd994-b91c-4943-a0f5-7bcffef6315c
+
+
+
 ## Test Files
 
 ### GetPixel
