@@ -4,9 +4,14 @@
 #include <iostream>
 #include <wingdi.h>
 
+//Test program that waits for you to open Microsoft Minesweeper
+//While running, press 1 on the numpad will print the coordinates of your mouse
+//press 2 on the numpad will print the RGB values of where your mouse is pointing
+//0 on the numpad exits the program
+
 int main()
 {
-    LPCWSTR windowName = L"Visual Studio Code";
+    LPCWSTR windowName = L"Microsoft Minesweeper";
     HWND hWND = FindWindow(NULL, windowName);
     while (hWND == NULL)
     {

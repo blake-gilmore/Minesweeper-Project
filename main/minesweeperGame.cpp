@@ -548,8 +548,8 @@ void minesweeperGame::initMap()
     //Set centerDifference as leftmost value for map checking
     centerDifference -= 20;
     centerDifference += (TopY * ScreenX * 4);
-    //SetCursorPos(bytesToPixelsX(centerDifference), bytesToPixelsY(centerDifference));
-       // //Sleep(500);
+    // SetCursorPos(bytesToPixelsX(centerDifference), bytesToPixelsY(centerDifference));
+    //    Sleep(500);
     int topOfFirstSquare = 0;
 
     //Find top of the first square
@@ -562,8 +562,8 @@ void minesweeperGame::initMap()
         {
             if (bitPointer[index] >= 100)
             {
-                //SetCursorPos(bytesToPixelsX(index), bytesToPixelsY(index));
-                //Sleep(50);
+                // SetCursorPos(bytesToPixelsX(index), bytesToPixelsY(index));
+                // Sleep(50);
                 topOfFirstSquare = index;
                 break;
             }
@@ -630,6 +630,7 @@ void minesweeperGame::initMap()
     int startOfGapY = mark;
     do
     {
+        // std::cout << mark;
         mark += (ScreenX * 4);
     } while (bitPointer[mark]<=100);
     mark -= (ScreenX * 4);
@@ -861,28 +862,31 @@ void minesweeperGame::FindTop()
     int index(0);
     while(bitPointer[index] > 100)
     {
-        //SetCursorPos(bytesToPixelsX(index), bytesToPixelsY(index));
-        //Sleep(50);
+        // SetCursorPos(bytesToPixelsX(index), bytesToPixelsY(index));
+        // Sleep(100);
         index += (ScreenX * 4);
     }
     index /= 4;
-    TopY = index / ScreenX;
+
+    // SetCursorPos(bytesToPixelsX(index), bytesToPixelsY(index));
+    // Sleep(50);
+    TopY = (index + (20 * (ScreenX * 4))) / ScreenX;
     return;
 }
 void minesweeperGame::FindRight()
 {
     //start at Y = TopY, and move right pixel by pixel until it finds a Blue value
     //Record X value into RightX
-    int index(TopY * ScreenX * 4);
-    while(bitPointer[index] < 100)
+    int index(TopY * ScreenX * 4 );
+    while(bitPointer[index] > 100)
     {
-        //SetCursorPos(bytesToPixelsX(index), bytesToPixelsY(index));
-        //Sleep(50);
+        // SetCursorPos(bytesToPixelsX(index), bytesToPixelsY(index));
+        // Sleep(2);
         index += 4;
     }
     
     index /= 4;
-    RightX = index % ScreenX;
+    RightX = ScreenX;
     return;
 }
 void minesweeperGame::printDimensions()

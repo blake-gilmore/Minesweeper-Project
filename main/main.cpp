@@ -54,7 +54,6 @@ int main()
             //Make Random move and get position
             tempNum = rand() % game.getGameRows();
             tempNum2 = rand() % game.getGameColumns();
-            
             SetCursorPos(game.mapSquares[tempNum][tempNum2].getXCoord(), game.mapSquares[tempNum][tempNum2].getYCoord());
             Sleep(50);
             leftClick();
