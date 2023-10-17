@@ -5,8 +5,13 @@ Documenting my progress learning how to make a computer play minesweeper through
 Works only with Microsoft Minesweeper at full screen. Use g++ *.cpp -l gdi32 -o main to compile and ./main.exe to run.
 Once running, and you have a Microsoft Minesweeper window at full screen, press 3 on the numpad to start the bot. Return to the program and pres control + C to close. 
 
-
+### Easy Board Demo
 https://github.com/blake-gilmore/Minesweeper-Project/assets/80655017/050fd994-b91c-4943-a0f5-7bcffef6315c
+
+### Medium Board Demo
+
+https://github.com/blake-gilmore/Minesweeper-Project/assets/80655017/bdbbae1d-abb9-44f1-a5ee-cc998ef9b491
+
 
 
 
